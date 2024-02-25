@@ -1,6 +1,7 @@
 import react from "@vitejs/plugin-react-swc";
 import { defineConfig } from "vite";
 import checker from "vite-plugin-checker";
+import ViteRestart from "vite-plugin-restart";
 
 export default defineConfig({
   server: {
@@ -8,12 +9,15 @@ export default defineConfig({
   },
   plugins: [
     react(),
-    !process.env.CI &&
-      checker({
-        eslint: {
-          lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-        },
-        typescript: true,
-      }),
+    ViteRestart({
+      restart: [".eslintrc*", ".prettierrc*", "tsconfig.json"],
+    }),
+    checker({
+      eslint: {
+        // for example, lint .ts and .tsx
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
+      typescript: true,
+    }),
   ],
 });
