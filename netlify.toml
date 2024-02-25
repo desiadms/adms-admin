@@ -1,0 +1,16 @@
+[build]
+  command = "bun run build"
+  publish = "dist"
+
+[dev]
+  framework = "#custom"
+  command = "bun run vite"
+  targetPort = 7412
+  port = 5173
+  publish = "dist"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
