@@ -6,12 +6,12 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+tsconfig.tsbuildinfo
 
 node_modules
 dist
 dist-ssr
 *.local
-**/__generated__/
 
 # Editor directories and files
 .vscode/*
@@ -24,5 +24,12 @@ dist-ssr
 *.sln
 *.sw?
 
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+
 # Local Netlify folder
 .netlify
+
+**/__generated__/

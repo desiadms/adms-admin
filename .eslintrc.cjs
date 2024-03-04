@@ -20,18 +20,6 @@ module.exports = {
   ],
   rules: {
     "no-unused-vars": "off",
-    "no-restricted-imports": [
-      "error",
-      {
-        patterns: [
-          {
-            group: ["tinybase/ui-react/*"],
-            message:
-              "Please import from store.ts instead as this file exports the same functions but with schema checking support.",
-          },
-        ],
-      },
-    ],
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-explicit-any": "error",
     "linebreak-style": ["error", "unix"],
