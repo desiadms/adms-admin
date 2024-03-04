@@ -1,10 +1,13 @@
+import { ApolloProvider } from "@apollo/client";
+import { Button, Input } from "@mui/joy";
 import {
   useAccessToken,
   useAuthenticationStatus,
   useSignInEmailPassword,
 } from "@nhost/react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
+import { createApolloClient } from "../graphqlClient";
 import { Dashboard } from "./Dashboard";
 
 type LoginFormData = {
@@ -29,11 +32,6 @@ function Login() {
   return (
     <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <img
-          className="mx-auto h-10 w-auto"
-          src="https://tailwindui.com/img/logos/mark.svg?color=gray&shade=600"
-          alt="Your Company"
-        />
         <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
           Sign in to your account
         </h2>
@@ -43,7 +41,7 @@ function Login() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
             user id
-            <input
+            <Input
               type="text"
               {...register("id", { required: "User ID is required" })}
             />
@@ -51,16 +49,16 @@ function Login() {
 
           <div>
             password
-            <input
+            <Input
               type="password"
               {...register("password", { required: "Password is required" })}
             />
           </div>
           <div>
-            <button disabled={isLoading} type="submit">
+            <Button disabled={isLoading} type="submit">
               Sign in
               {isLoading && <p>loading ...</p>}
-            </button>
+            </Button>
             {isError && <div> Error signing in</div>}
           </div>
         </form>
@@ -74,6 +72,18 @@ function FullPageSpinner() {
     <div className="absolute w-screen h-screen top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
       <div className="flex justify-center items-center h-full">loading</div>
     </div>
+  );
+}
+
+export function AuthorizedApolloProvider() {
+  const accessToken = useAccessToken();
+
+  const client = useMemo(() => createApolloClient(accessToken), [accessToken]);
+
+  return (
+    <ApolloProvider client={client}>
+      <Dashboard />
+    </ApolloProvider>
   );
 }
 
@@ -93,5 +103,5 @@ export function AuthWrapper() {
     return <Login />;
   }
 
-  return <Dashboard />;
+  return <AuthorizedApolloProvider />;
 }

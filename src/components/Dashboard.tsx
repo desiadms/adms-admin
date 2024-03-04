@@ -13,7 +13,6 @@ export function Dashboard() {
     <div className="min-h-full">
       <main>
         <Outlet />
-
         {/* <pre>{JSON.stringify(state, null, 2)}</pre> */}
       </main>
       <TanStackRouterDevtools position="bottom-right" />
