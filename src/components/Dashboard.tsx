@@ -1,34 +1,40 @@
 import { useSignOut } from "@nhost/react";
 import { Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtools } from "@tanstack/router-devtools";
-import { AgGridReact } from 'ag-grid-react'; // AG Grid Component
+import { ColDef } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
-import { useState } from "react";
+import { AgGridReact } from "ag-grid-react"; // AG Grid Component
+import { ProjectsQuery } from "src/__generated__/gql/graphql";
+import { useProjects } from "../hooks";
 
 export function Home() {
-  const [rowData, setRowData] = useState([
-    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
-    { make: "Ford", model: "F-Series", price: 33850, electric: false },
-    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
-  ]);
-  
-  // Column Definitions: Defines the columns to be displayed.
-  const colDefs = [
-    { field: "make" },
-    { field: "model" },
-    { field: "price" },
-    { field: "electric" }
-  ];
-  return   <div
-  className="ag-theme-quartz" // applying the grid theme
-  style={{ height: 500 }} // the grid will fill the size of the parent container
- >
-   <AgGridReact
-       rowData={rowData}
-       columnDefs={colDefs}
-   />
- </div>
+  const { data, loading } = useProjects();
+
+  const columnDefs = [
+    { field: "id", headerName: "ID" },
+    { field: "name", headerName: "Name" },
+    { field: "poc", headerName: "POC" },
+    { field: "status", headerName: "Status" },
+    { field: "sub_contractor", headerName: "Sub Contractor" },
+    { field: "location", headerName: "Location" },
+    { field: "comment", headerName: "Comment" },
+    { field: "contractor", headerName: "Contractor" },
+    { field: "created_at", headerName: "Created At" },
+  ] satisfies ColDef<ProjectsQuery["projects"][number]>[];
+
+  return (
+    <div
+      className="ag-theme-quartz" // applying the grid theme
+      style={{ height: 500 }} // the grid will fill the size of the parent container
+    >
+      {loading ? (
+        <div> loading </div>
+      ) : (
+        <AgGridReact rowData={data} columnDefs={columnDefs} />
+      )}
+    </div>
+  );
 }
 
 export function Dashboard() {

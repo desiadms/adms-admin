@@ -54,7 +54,7 @@ type TGetToken = () => Promise<string | undefined>;
 export function createApolloClient(token: string | null) {
   const cache = new InMemoryCache();
   const httpLink = createHttpLink({
-    uri: import.meta.env.VITE_HASURA_URL,
+    uri: import.meta.env.VITE_HASURA_ENDPOINT,
   });
 
   const authLink = setContext(async (_, { headers }) => {
