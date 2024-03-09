@@ -1,14 +1,3 @@
-import { NhostClient } from "@nhost/react";
-
-export const devMode = import.meta.env.MODE === "development";
-
-export const nhost = new NhostClient({
-  subdomain: import.meta.env.VITE_NHOST_SUBDOMAIN,
-  region: import.meta.env.VITE_NHOST_REGION,
-});
-
-export const hasuraURL = import.meta.env.VITE_HASURA_ENDPOINT;
-
 export function keep<T, U>(
   coll: T[],
   mapperFn: (item: T) => U | null | undefined,
@@ -20,4 +9,19 @@ export function keep<T, U>(
     }
     return acc;
   }, []);
+}
+
+export function sortAlphabeticallyEarlyMatch(
+  word1: string,
+  word2: string,
+  query: string,
+) {
+  const indexA = word1.toLowerCase().indexOf(query.toLowerCase());
+  const indexB = word2.toLowerCase().indexOf(query.toLowerCase());
+
+  if (indexA !== indexB) {
+    return indexA - indexB;
+  }
+
+  return word1.localeCompare(word2);
 }

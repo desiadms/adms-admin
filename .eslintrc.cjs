@@ -23,6 +23,7 @@ module.exports = {
     "@typescript-eslint/no-unused-vars": "off",
     "@typescript-eslint/no-explicit-any": "error",
     "linebreak-style": ["error", "unix"],
+    "@typescript-eslint/no-non-null-assertion": "off",
     "unused-imports/no-unused-imports": "error",
     "react-refresh/only-export-components": [
       "warn",

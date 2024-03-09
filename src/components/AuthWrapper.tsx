@@ -1,14 +1,12 @@
 import { ApolloProvider } from "@apollo/client";
 import { Button, Input } from "@mui/joy";
-import {
-  useAccessToken,
-  useAuthenticationStatus,
-  useSignInEmailPassword,
-} from "@nhost/react";
+import { useSignInEmailPassword } from "@nhost/react";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { createApolloClient } from "../graphqlClient";
-import { Dashboard } from "./Dashboard";
+import { Dashboard } from "../nav/Dashboard";
+import { useAuth } from "../nhost";
 
 type LoginFormData = {
   id: string;
@@ -19,14 +17,15 @@ function convertToEmail(id: string) {
   return `${id}@desiadms.com`;
 }
 
-function Login() {
+export function Login() {
   const { signInEmailPassword, isLoading, isError } = useSignInEmailPassword();
-
+  const navigate = useNavigate();
   const { register, handleSubmit } = useForm<LoginFormData>();
 
   async function onSubmit(data: LoginFormData) {
     const email = convertToEmail(data.id);
     await signInEmailPassword(email, data.password);
+    navigate({ to: "/projects" });
   }
 
   return (
@@ -76,7 +75,7 @@ function FullPageSpinner() {
 }
 
 export function AuthorizedApolloProvider() {
-  const accessToken = useAccessToken();
+  const { accessToken } = useAuth();
 
   const client = useMemo(() => createApolloClient(accessToken), [accessToken]);
 
@@ -88,8 +87,10 @@ export function AuthorizedApolloProvider() {
 }
 
 export function AuthWrapper() {
-  const { isAuthenticated, isLoading } = useAuthenticationStatus();
-  const accessToken = useAccessToken();
+  const {
+    accessToken,
+    authenticationStatus: { isAuthenticated, isLoading },
+  } = useAuth();
 
   useEffect(() => {
     if (accessToken) console.log("token");
@@ -99,7 +100,7 @@ export function AuthWrapper() {
     return <FullPageSpinner />;
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated && !isLoading) {
     return <Login />;
   }
 
