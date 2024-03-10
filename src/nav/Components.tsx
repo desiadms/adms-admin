@@ -37,7 +37,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import { MdStarOutline, MdStarRate } from "react-icons/md";
 import { useDarkMode, useMutateUserSettings } from "../admin";
 import Link from "../components/Link";
-import { headerHeight } from "../globals";
+import { borderColor, headerHeight } from "../globals";
 import { useAuth } from "../nhost";
 import { useProject, useProjects } from "../projects/hooks";
 import { useSideBar } from "./hooks";
@@ -342,10 +342,7 @@ export function TopNav({ links }: { links?: LinkEntry[] }) {
         zIndex: 1000,
         bgcolor: (theme) => (theme.palette.mode === "dark" ? "black" : "white"),
         boxShadow: "none",
-        borderBottom: (theme) =>
-          theme.palette.mode === "dark"
-            ? `1px solid ${theme.palette.neutral[700]}`
-            : `1px solid ${theme.palette.neutral[200]}`,
+        borderBottom: borderColor,
         left: sideBarWidth,
         borderRadius: 0,
         position: "sticky",
