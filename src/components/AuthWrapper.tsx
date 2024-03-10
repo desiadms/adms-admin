@@ -2,7 +2,7 @@ import { ApolloProvider } from "@apollo/client";
 import { Button, Input } from "@mui/joy";
 import { useSignInEmailPassword } from "@nhost/react";
 import { useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { createApolloClient } from "../graphqlClient";
 import { Dashboard } from "../nav/Dashboard";
@@ -88,13 +88,8 @@ export function AuthorizedApolloProvider() {
 
 export function AuthWrapper() {
   const {
-    accessToken,
     authenticationStatus: { isAuthenticated, isLoading },
   } = useAuth();
-
-  useEffect(() => {
-    if (accessToken) console.log("token");
-  }, [accessToken]);
 
   if (isLoading) {
     return <FullPageSpinner />;
