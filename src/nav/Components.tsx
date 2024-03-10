@@ -24,6 +24,7 @@ import {
 } from "@tanstack/react-router";
 import { ChangeEvent, MouseEvent, ReactNode, useEffect, useState } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import { FaUser } from "react-icons/fa";
 import {
   FiHelpCircle,
   FiLogOut,
@@ -39,7 +40,6 @@ import Link from "../components/Link";
 import { headerHeight } from "../globals";
 import { useAuth } from "../nhost";
 import { useProject, useProjects } from "../projects/hooks";
-import { sortAlphabeticallyEarlyMatch } from "../utils";
 import { useSideBar } from "./hooks";
 
 export function OrgSearchItems({ handleClick }: { handleClick: () => void }) {
@@ -55,13 +55,13 @@ export function OrgSearchItems({ handleClick }: { handleClick: () => void }) {
       } as const),
   );
 
-  const sortedProjects = projectLinks?.sort((a, b) =>
-    sortAlphabeticallyEarlyMatch(a.label, b.label, query),
+  const sortedProjects = projectLinks?.filter((project) =>
+    project.label.toLowerCase().includes(query.toLowerCase()),
   );
 
   return (
     <ErrorBoundary fallback={<div>error</div>}>
-      <OrgSearchInput setQuery={(e) => setQuery(e.target.value)} />
+      <ProjectSearchInput setQuery={(e) => setQuery(e.target.value)} />
       <Box
         sx={{
           mt: 2,
@@ -85,7 +85,7 @@ export function OrgSearchItems({ handleClick }: { handleClick: () => void }) {
           <SidebarItem
             key={id}
             id={id}
-            label={label}
+            label={label.toLowerCase()}
             to={to}
             params={params}
             handleClick={handleClick}
@@ -118,7 +118,7 @@ export function ProjectPopup() {
 
   return (
     <>
-      <Button variant="solid" onClick={handleClick}>
+      <Button variant="outlined" size="sm" onClick={handleClick}>
         <Typography
           sx={{
             maxWidth: {
@@ -131,9 +131,8 @@ export function ProjectPopup() {
           whiteSpace={"nowrap"}
           textOverflow={"ellipsis"}
           level="body-xs"
-          textColor="white"
         >
-          {projectName || "Orgs"}
+          {projectName || "Projects"}
         </Typography>
       </Button>
       <ClickAwayListener
@@ -146,7 +145,7 @@ export function ProjectPopup() {
           style={{
             zIndex: 1000,
           }}
-          id="org-popup"
+          id="project-popup"
           offset={4}
           open={open}
           anchor={anchor}
@@ -449,8 +448,16 @@ export function TopNav({ links }: { links?: LinkEntry[] }) {
       >
         <Dropdown>
           <MenuButton variant="outlined" size="sm">
-            <Typography level="body-xs" textColor="text.tertiary">
-              {userData?.displayName ?? "Loading User..."}
+            <Typography
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              level="body-xs"
+              textColor="text.tertiary"
+            >
+              <FaUser />
             </Typography>
           </MenuButton>
           <Menu
@@ -471,7 +478,7 @@ export function TopNav({ links }: { links?: LinkEntry[] }) {
                 }}
               >
                 <Typography level="body-xs" textColor="text.tertiary">
-                  {userData?.email ?? "Loading User..."}
+                  {userData?.displayName ?? "Loading User..."}
                 </Typography>
               </Box>
             </MenuItem>
@@ -513,7 +520,7 @@ export type LinkEntry = {
   to: LinkOptions["to"];
 };
 
-export function OrgSearchInput({
+export function ProjectSearchInput({
   setQuery,
 }: {
   setQuery: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -616,8 +623,8 @@ export function SidebarItem({
     to,
   });
   const currentPath = useRouterState().location.pathname;
-  const orgIdRegex = /(?<=orgs\/)\d+(?=\/)/;
-  const currentOrgId = currentPath.match(orgIdRegex)?.[0];
+  const projectIdRegex = /(?<=projects\/)\d+(?=\/)/;
+  const currentProjectId = currentPath.match(projectIdRegex)?.[0];
 
   return (
     <ErrorBoundary fallback={<div>error</div>}>
@@ -634,7 +641,9 @@ export function SidebarItem({
           handleClick?.();
         }}
       >
-        <SidebarItemBox selected={currentOrgId === id}>{label}</SidebarItemBox>
+        <SidebarItemBox selected={currentProjectId === id}>
+          {label}
+        </SidebarItemBox>
       </RouterLink>
     </ErrorBoundary>
   );

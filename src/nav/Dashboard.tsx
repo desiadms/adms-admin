@@ -1,4 +1,4 @@
-import { CssBaseline, Divider, Drawer, Stack, Typography } from "@mui/joy";
+import { CssBaseline, Divider, Drawer, Stack } from "@mui/joy";
 import {
   CssVarsProvider as JoyCssVarsProvider,
   useColorScheme,
@@ -14,7 +14,7 @@ import { SidebarLink } from "./Components";
 import { useSideBar } from "./hooks";
 
 function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
-  const { collapsedSidebar } = useSideBar();
+  const { collapsedSidebar, toggleSidebar } = useSideBar();
   const links = useSingleProjectLinks();
 
   return (
@@ -28,6 +28,66 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
           px: collapsedSidebar ? 1 : 2,
         }}
       >
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            flexWrap: "wrap",
+            justifyContent: "space-between",
+            gap: 2,
+          }}
+        >
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              ...(collapsedSidebar && {
+                width: "100%",
+              }),
+            }}
+          >
+            DESI
+          </Box>
+          <Box
+            onClick={() => toggleSidebar(!collapsedSidebar)}
+            sx={{
+              ...(collapsedSidebar && {
+                width: "100%",
+              }),
+              display: {
+                xs: collapsedSidebar ? "none" : "flex",
+                md: "flex",
+              },
+              alignItems: "center",
+              justifyContent: "center",
+              "&:hover": {
+                opacity: 0.8,
+              },
+              cursor: "pointer",
+              transform: collapsedSidebar ? "rotate(180deg)" : "rotate(0deg)",
+            }}
+          >
+            <svg
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="currentColor"
+              width="20"
+              height="20"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M13.59 6.47a.75.75 0 0 0-1.06 0l-5.06 5a.75.75 0 0 0 0 1.06l5.06 5a.75.75 0 0 0 1.05-1.06l-3.76-3.72H21a.75.75 0 0 0 0-1.5H9.82l3.76-3.72c.3-.29.3-.76 0-1.06Z"
+              ></path>
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M3 3.25a.75.75 0 0 0-.75.75v16a.75.75 0 0 0 1.5 0V4A.75.75 0 0 0 3 3.25Z"
+              ></path>
+            </svg>
+          </Box>
+        </Box>
         <Divider sx={{ borderColor: "gray" }} />
       </Box>
       <Box
@@ -90,16 +150,6 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
               </Stack>
             </Stack>
           )}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            gap: 2,
-            px: 2,
-          }}
-        >
-          <Typography>Something?</Typography>
         </Box>
       </Box>
     </>

@@ -10,18 +10,3 @@ export function keep<T, U>(
     return acc;
   }, []);
 }
-
-export function sortAlphabeticallyEarlyMatch(
-  word1: string,
-  word2: string,
-  query: string,
-) {
-  const indexA = word1.toLowerCase().indexOf(query.toLowerCase());
-  const indexB = word2.toLowerCase().indexOf(query.toLowerCase());
-
-  if (indexA !== indexB) {
-    return indexA - indexB;
-  }
-
-  return word1.localeCompare(word2);
-}
