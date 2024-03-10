@@ -485,7 +485,6 @@ export function TopNav({ links }: { links?: LinkEntry[] }) {
             <ListDivider />
             <MenuItem
               onClick={() => {
-                console.log("in here");
                 mutateUserSettings({ darkMode: !darkMode });
               }}
             >
