@@ -67,7 +67,7 @@ export function Login() {
             />
           </FormControl>
           <Button sx={{ mt: 1 }} onClick={handleSubmit(onSubmit)}>
-            {isLoading ? 'loading' : 'Sign in'}
+            {isLoading ? 'Signing in...' : 'Sign in'}
           </Button>
           {isError && <div> Error signing in</div>}
         </Sheet>
