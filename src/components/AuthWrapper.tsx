@@ -1,5 +1,5 @@
 import { ApolloProvider } from "@apollo/client";
-import { Button, Input } from "@mui/joy";
+import { Button, FormControl, FormLabel, Input, Link, Sheet, Typography } from "@mui/joy";
 import { useSignInEmailPassword } from "@nhost/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -29,40 +29,81 @@ export function Login() {
   }
 
   return (
-    <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-          Sign in to your account
-        </h2>
-      </div>
-
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <>
+      <main>
+        <Sheet
+          sx={{
+            width: 300,
+            mx: 'auto', // margin left & right
+            my: 4, // margin top & bottom
+            py: 3, // padding top & bottom
+            px: 2, // padding left & right
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            borderRadius: 'sm',
+            boxShadow: 'md',
+          }}
+          variant="outlined"
+        >
           <div>
-            user id
+            <Typography level="h4" component="h1">
+              <b>Welcome!</b>
+            </Typography>
+            <Typography level="body-sm">Sign in to your account.</Typography>
+          </div>
+          <FormControl>
+            <FormLabel>Email</FormLabel>
             <Input
-              type="text"
+              type="email"
               {...register("id", { required: "User ID is required" })}
             />
-          </div>
-
-          <div>
-            password
+          </FormControl>
+          <FormControl>
+            <FormLabel>Password</FormLabel>
             <Input
               type="password"
               {...register("password", { required: "Password is required" })}
             />
-          </div>
-          <div>
-            <Button disabled={isLoading} type="submit">
-              Sign in
-              {isLoading && <p>loading ...</p>}
-            </Button>
-            {isError && <div> Error signing in</div>}
-          </div>
-        </form>
-      </div>
-    </div>
+          </FormControl>
+          <Button sx={{ mt: 1 }} onClick={handleSubmit(onSubmit)}>Sign in</Button>
+        </Sheet>
+      </main>
+    {/* // <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+    //   <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+    //     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+    //       Sign in to your account
+    //     </h2>
+    //   </div>
+
+    //   <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    //     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    //       <div>
+    //         user id
+    //         <Input
+    //           type="text"
+    //           {...register("id", { required: "User ID is required" })}
+    //         />
+    //       </div>
+
+    //       <div>
+    //         password
+    //         <Input
+    //           type="password"
+    //           {...register("password", { required: "Password is required" })}
+    //         />
+    //       </div>
+    //       <div>
+    //         <Button disabled={isLoading} type="submit">
+    //           Sign in
+    //           {isLoading && <p>loading ...</p>}
+    //         </Button>
+    //         {isError && <div> Error signing in</div>}
+    //       </div>
+    //     </form>
+    //   </div>
+    // </div> */}
+    </>
   );
 }
 
