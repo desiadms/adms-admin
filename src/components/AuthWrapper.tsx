@@ -1,5 +1,5 @@
 import { ApolloProvider } from "@apollo/client";
-import { Button, FormControl, FormLabel, Input, Link, Sheet, Typography } from "@mui/joy";
+import { Button, FormControl, FormLabel, Input, Sheet, Typography } from "@mui/joy";
 import { useSignInEmailPassword } from "@nhost/react";
 import { useNavigate } from "@tanstack/react-router";
 import { useMemo } from "react";
@@ -34,10 +34,10 @@ export function Login() {
         <Sheet
           sx={{
             width: 300,
-            mx: 'auto', // margin left & right
-            my: 4, // margin top & bottom
-            py: 3, // padding top & bottom
-            px: 2, // padding left & right
+            mx: 'auto',
+            my: 4,
+            py: 3,
+            px: 2,
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
@@ -66,43 +66,12 @@ export function Login() {
               {...register("password", { required: "Password is required" })}
             />
           </FormControl>
-          <Button sx={{ mt: 1 }} onClick={handleSubmit(onSubmit)}>Sign in</Button>
+          <Button sx={{ mt: 1 }} onClick={handleSubmit(onSubmit)}>
+            {isLoading ? 'loading' : 'Sign in'}
+          </Button>
+          {isError && <div> Error signing in</div>}
         </Sheet>
       </main>
-    {/* // <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
-    //   <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-    //     <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
-    //       Sign in to your account
-    //     </h2>
-    //   </div>
-
-    //   <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-    //     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-    //       <div>
-    //         user id
-    //         <Input
-    //           type="text"
-    //           {...register("id", { required: "User ID is required" })}
-    //         />
-    //       </div>
-
-    //       <div>
-    //         password
-    //         <Input
-    //           type="password"
-    //           {...register("password", { required: "Password is required" })}
-    //         />
-    //       </div>
-    //       <div>
-    //         <Button disabled={isLoading} type="submit">
-    //           Sign in
-    //           {isLoading && <p>loading ...</p>}
-    //         </Button>
-    //         {isError && <div> Error signing in</div>}
-    //       </div>
-    //     </form>
-    //   </div>
-    // </div> */}
     </>
   );
 }
