@@ -88,11 +88,7 @@ function TableTopToolbar<TData extends RequiredTableField>({
               filterText ? (
                 <IconButton
                   aria-label="clear filter"
-                  onClick={() => {
-                    setFilterText("");
-                    api.resetQuickFilter();
-                    api.onFilterChanged();
-                  }}
+                  onClick={() => setFilterTextGrid("")}
                 >
                   <IoCloseSharp />
                 </IconButton>
