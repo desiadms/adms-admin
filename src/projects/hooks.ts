@@ -20,9 +20,9 @@ export const queryProjects = graphql(/* GraphQL */ `
 `);
 
 export function useProjects() {
-  const res = useQuery(queryProjects);
+  const { loading, data } = useQuery(queryProjects);
 
-  return { ...res, data: res.data?.projects };
+  return { loading, data: data?.projects };
 }
 
 export function useSingleProjectLinks() {

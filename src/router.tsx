@@ -36,6 +36,13 @@ const projectsHomeRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
+const projectCreateRoute = createRoute({
+  getParentRoute: () => projectsRoute,
+  path: "create",
+  component: lazyRouteComponent(() => import("./projects/Create"), "Create"),
+  errorComponent: () => "Oh crap!",
+});
+
 const singleProjectRoute = createRoute({
   getParentRoute: () => projectsRoute,
   path: "$project",
@@ -70,6 +77,7 @@ const routeTree = rootRoute.addChildren([
   homeRoute,
   projectsRoute.addChildren([
     projectsHomeRoute,
+    projectCreateRoute,
     singleProjectRoute.addChildren([
       singleProjectUsersRoute,
       singleProjectTasksRoute,

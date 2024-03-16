@@ -1,4 +1,5 @@
-import { Box } from "@mui/joy";
+import { Box, Button } from "@mui/joy";
+import { useNavigate } from "@tanstack/react-router";
 import { ColDef } from "ag-grid-community";
 import { ProjectsQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
@@ -7,6 +8,7 @@ import { useProjects } from "./hooks";
 
 export function Projects() {
   const { data, loading } = useProjects();
+  const navigate = useNavigate({ from: "/projects" });
 
   const columnDefs = [
     { field: "id", headerName: "ID" },
@@ -22,11 +24,23 @@ export function Projects() {
 
   return (
     <Box>
-      <TopNav links={[]} />
+      <TopNav />
       {loading ? (
         <div> loading </div>
       ) : (
-        <Table rowData={data} columnDefs={columnDefs} />
+        <Table
+          rightChildren={
+            <Button
+              variant="outlined"
+              size="sm"
+              onClick={() => navigate({ to: "/projects/create" })}
+            >
+              Create Project
+            </Button>
+          }
+          rowData={data}
+          columnDefs={columnDefs}
+        />
       )}
     </Box>
   );
