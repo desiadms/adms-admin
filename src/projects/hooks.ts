@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { graphql } from "../graphql";
 import { TopNav } from "../nav/Components";
 import { useQuerySub } from "../utils";
@@ -19,18 +20,32 @@ export const queryProjects = graphql(/* GraphQL */ `
   }
 `);
 
-export const mutationCreateProject = graphql(/* GraphQL */ `
-  mutation CreateProject($project: projects_insert_input!) {
-    insert_projects_one(object: $project) {
+export const mutationUpsertProject = graphql(/* GraphQL */ `
+  mutation UpsertProject($project: projects_insert_input!) {
+    insert_projects_one(
+      object: $project
+      on_conflict: {
+        update_columns: [
+          name
+          poc
+          status
+          sub_contractor
+          location
+          comment
+          contractor
+        ]
+        constraint: projects_pkey
+      }
+    ) {
       id
     }
   }
 `);
 
 export function useProjects() {
-  const { loading, data } = useQuerySub(queryProjects);
+  const { loading, data, error } = useQuerySub(queryProjects);
 
-  return { loading, data: data?.projects };
+  return { loading, data: data?.projects, error };
 }
 
 export function useSingleProjectLinks() {
@@ -62,7 +77,10 @@ export function useProjectId() {
 
 export function useProject() {
   const projectId = useProjectId();
-  const projects = useProjects();
-  const project = projects.data?.find((p) => p.id === projectId);
-  return project;
+  const { data, loading, error } = useProjects();
+  const project = useMemo(
+    () => data?.find((p) => p.id === projectId),
+    [data, projectId],
+  );
+  return { data: project, loading, error };
 }

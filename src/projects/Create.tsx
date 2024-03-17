@@ -1,42 +1,19 @@
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Box, Button } from "@mui/joy";
-import { SxProps } from "@mui/joy/styles/types";
+import { Box, Button, Divider, Typography } from "@mui/joy";
 import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { MdBlock, MdCheck } from "react-icons/md";
-import { z } from "zod";
-import { ProjectsQuery } from "../__generated__/gql/graphql";
 import {
   InputField,
   PrettySwitchField,
   TextAreaField,
 } from "../components/Form";
+import { inputSx, inputWidth, joy4ValueInPx, maxFormWidth } from "../globals";
 import { TopNav } from "../nav/Components";
-import { mutationCreateProject } from "./hooks";
-
-type CreateProjectForm = ProjectsQuery["projects"][number];
-
-const projectValidation = z.object({
-  name: z.string().min(3),
-  poc: z.string().min(3),
-  status: z.boolean().nullish(),
-  contractor: z.string().min(3),
-  sub_contractor: z.string().min(3),
-  location: z.string().min(3),
-  comment: z.string().optional(),
-});
-
-const inputWidth = 260;
-const inputSx = {
-  width: inputWidth,
-} satisfies SxProps;
-
-const joy4ValueInPx = 32;
-
-// 3 inputs + 2 gaps + left and right padding
-const maxFormWidth = 260 * 3 + joy4ValueInPx * 2 + joy4ValueInPx * 2;
+import { mutationUpsertProject } from "./hooks";
+import { ProjectForm, projectValidation } from "./utils";
 
 export function Create() {
   const {
@@ -44,14 +21,14 @@ export function Create() {
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<CreateProjectForm>({
+  } = useForm<ProjectForm>({
     resolver: zodResolver(projectValidation),
   });
 
-  const [executeMutation] = useMutation(mutationCreateProject);
+  const [executeMutation] = useMutation(mutationUpsertProject);
   const navigate = useNavigate({ from: "/projects/create" });
 
-  async function onSubmit(data: CreateProjectForm) {
+  async function onSubmit(data: ProjectForm) {
     try {
       const res = await toast.promise(
         executeMutation({ variables: { project: data } }),
@@ -88,6 +65,9 @@ export function Create() {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
+          <Typography level="h3">Crate Project</Typography>
+          <Divider sx={{ my: 2 }} />
+
           <Box
             sx={{
               display: "flex",

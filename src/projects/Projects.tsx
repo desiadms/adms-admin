@@ -1,6 +1,7 @@
 import { Box, Button } from "@mui/joy";
 import { useNavigate } from "@tanstack/react-router";
 import { ColDef } from "ag-grid-community";
+import { useCallback } from "react";
 import { ProjectsQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
 import { TopNav } from "../nav/Components";
@@ -22,6 +23,18 @@ export function Projects() {
     { field: "created_at", headerName: "Created At" },
   ] satisfies ColDef<ProjectsQuery["projects"][number]>[];
 
+  const handleNavigate = useCallback(
+    (params) => {
+      if (params?.id) {
+        navigate({
+          to: `/projects/$project/edit`,
+          params: { project: params.id.toString() },
+        });
+      }
+    },
+    [navigate],
+  );
+
   return (
     <Box>
       <TopNav />
@@ -40,6 +53,7 @@ export function Projects() {
           }
           rowData={data}
           columnDefs={columnDefs}
+          handleNavigate={handleNavigate}
         />
       )}
     </Box>

@@ -102,7 +102,7 @@ export function OrgSearchItems({ handleClick }: { handleClick: () => void }) {
 }
 
 export function ProjectPopup() {
-  const projectName = useProject()?.name;
+  const { data: project } = useProject();
 
   const [anchor, setAnchor] = useState<null | HTMLElement>(null);
 
@@ -132,7 +132,7 @@ export function ProjectPopup() {
           textOverflow={"ellipsis"}
           level="body-xs"
         >
-          {projectName || "Projects"}
+          {project?.name || "Projects"}
         </Typography>
       </Button>
       <ClickAwayListener

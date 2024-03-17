@@ -1,4 +1,5 @@
 import { Theme } from "@mui/joy";
+import { SxProps } from "@mui/joy/styles/types";
 import { GridApi } from "ag-grid-community";
 import { atom, useAtom } from "jotai";
 
@@ -14,3 +15,13 @@ const tableApiAtom = atom<GridApi | null>(null);
 export function useTableApi() {
   return useAtom(tableApiAtom);
 }
+
+export const inputWidth = 260;
+export const inputSx = {
+  width: inputWidth,
+} satisfies SxProps;
+
+export const joy4ValueInPx = 32;
+
+// 3 inputs + 2 gaps + left and right padding
+export const maxFormWidth = 260 * 3 + joy4ValueInPx * 2 + joy4ValueInPx * 2;

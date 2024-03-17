@@ -1,6 +1,11 @@
 import { Box, Button, IconButton, Input } from "@mui/joy";
 import { useRouterState } from "@tanstack/react-router";
-import { BaseExportParams, GetRowIdParams, GridApi } from "ag-grid-community";
+import {
+  BaseExportParams,
+  CellDoubleClickedEvent,
+  GetRowIdParams,
+  GridApi,
+} from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
@@ -140,9 +145,12 @@ function TableTopToolbar<TData extends RequiredTableField>({
 export function Table<TData extends RequiredTableField>({
   leftChildren,
   rightChildren,
+  handleNavigate,
   ...props
 }: ComponentProps<typeof AgGridReact<TData>> &
-  Omit<TTableTopToolbar<TData>, "api">) {
+  Omit<TTableTopToolbar<TData>, "api"> & {
+    handleNavigate?: (params?: TData) => void;
+  }) {
   const darkMode = useDarkMode();
   const {
     location: { pathname },
@@ -163,6 +171,15 @@ export function Table<TData extends RequiredTableField>({
       setApi(params.api);
     },
     [setApi],
+  );
+
+  const onCellDoubleClicked = useCallback(
+    (params: CellDoubleClickedEvent<TData>) => {
+      if (handleNavigate && !params.colDef.editable) {
+        handleNavigate(params.data);
+      }
+    },
+    [handleNavigate],
   );
 
   return (
@@ -196,6 +213,7 @@ export function Table<TData extends RequiredTableField>({
           onGridReady={onGridReady}
           getRowId={getRowId}
           onGridPreDestroyed={onGridPreDestroyed}
+          onCellDoubleClicked={onCellDoubleClicked}
           {...props}
         />
       </Box>
