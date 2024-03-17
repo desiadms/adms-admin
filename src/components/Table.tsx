@@ -189,7 +189,7 @@ export function Table<TData extends RequiredTableField>({
       >
         <AgGridReact
           key={pathname}
-          sideBar
+          defaultColDef={{ filter: true, floatingFilter: true }}
           tooltipShowDelay={0}
           tooltipHideDelay={0}
           enableBrowserTooltips

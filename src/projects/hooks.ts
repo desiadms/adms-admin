@@ -1,7 +1,7 @@
-import { useQuery } from "@apollo/client";
 import { useParams } from "@tanstack/react-router";
 import { graphql } from "../graphql";
 import { TopNav } from "../nav/Components";
+import { useQuerySub } from "../utils";
 
 export const queryProjects = graphql(/* GraphQL */ `
   query Projects {
@@ -19,8 +19,16 @@ export const queryProjects = graphql(/* GraphQL */ `
   }
 `);
 
+export const mutationCreateProject = graphql(/* GraphQL */ `
+  mutation CreateProject($project: projects_insert_input!) {
+    insert_projects_one(object: $project) {
+      id
+    }
+  }
+`);
+
 export function useProjects() {
-  const { loading, data } = useQuery(queryProjects);
+  const { loading, data } = useQuerySub(queryProjects);
 
   return { loading, data: data?.projects };
 }

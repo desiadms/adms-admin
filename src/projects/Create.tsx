@@ -1,7 +1,10 @@
+import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button } from "@mui/joy";
 import { SxProps } from "@mui/joy/styles/types";
+import { useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { MdBlock, MdCheck } from "react-icons/md";
 import { z } from "zod";
 import { ProjectsQuery } from "../__generated__/gql/graphql";
@@ -11,6 +14,7 @@ import {
   TextAreaField,
 } from "../components/Form";
 import { TopNav } from "../nav/Components";
+import { mutationCreateProject } from "./hooks";
 
 type CreateProjectForm = ProjectsQuery["projects"][number];
 
@@ -44,8 +48,31 @@ export function Create() {
     resolver: zodResolver(projectValidation),
   });
 
-  function onSubmit(data: CreateProjectForm) {
-    console.log(data);
+  const [executeMutation] = useMutation(mutationCreateProject);
+  const navigate = useNavigate({ from: "/projects/create" });
+
+  async function onSubmit(data: CreateProjectForm) {
+    try {
+      const res = await toast.promise(
+        executeMutation({ variables: { project: data } }),
+        {
+          loading: "Creating project...",
+          success: "Project created",
+          error: "Failed to create project",
+        },
+      );
+
+      const projectId = res?.data?.insert_projects_one?.id;
+
+      if (!projectId) throw new Error("Cannot find project id in response");
+
+      navigate({
+        to: "/projects/$project/users",
+        params: { project: projectId },
+      });
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (
