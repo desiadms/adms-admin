@@ -7,6 +7,7 @@ import {
   Option,
   Select,
   Switch,
+  Textarea,
   Typography,
 } from "@mui/joy";
 import { ComponentProps, forwardRef } from "react";
@@ -199,3 +200,24 @@ export function PrettySwitchField<TFields extends FieldValues>({
     </FormControl>
   );
 }
+
+export const TextAreaField = forwardRef<
+  HTMLTextAreaElement,
+  {
+    label?: string;
+    error?: FieldError | undefined;
+    type?: ComponentProps<typeof Input>["type"];
+    sx?: ComponentProps<typeof FormControl>["sx"];
+    endDecorator?: React.ReactNode;
+  } & ReturnType<UseFormRegister<FieldValues>>
+>(({ label, error, sx, ...rest }, ref) => {
+  return (
+    <FormControl sx={sx}>
+      {label && (
+        <FormLabel sx={{ textTransform: "capitalize" }}>{label}</FormLabel>
+      )}
+      <Textarea minRows={4} slotProps={{ textarea: { ref: ref } }} {...rest} />
+      {error && <FormHelperText>{error?.message}</FormHelperText>}
+    </FormControl>
+  );
+});
