@@ -16,7 +16,7 @@ export function Projects() {
   const navigate = useNavigate({ from: "/projects" });
 
   const columnDefs = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", hide: true },
     { field: "name", headerName: "Name" },
     { field: "poc", headerName: "POC" },
     {
