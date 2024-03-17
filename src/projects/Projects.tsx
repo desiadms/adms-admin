@@ -15,7 +15,12 @@ export function Projects() {
     { field: "id", headerName: "ID" },
     { field: "name", headerName: "Name" },
     { field: "poc", headerName: "POC" },
-    { field: "status", headerName: "Status" },
+    {
+      field: "status",
+      headerName: "Status",
+      cellDataType: "text",
+      valueGetter: (params) => (params.data?.status ? "Active" : "Inactive"),
+    },
     { field: "sub_contractor", headerName: "Sub Contractor" },
     { field: "location", headerName: "Location" },
     { field: "comment", headerName: "Comment" },

@@ -206,7 +206,11 @@ export function Table<TData extends RequiredTableField>({
       >
         <AgGridReact
           key={pathname}
-          defaultColDef={{ filter: true, floatingFilter: true }}
+          defaultColDef={{
+            filter: "agTextColumnFilter",
+            floatingFilter: true,
+            menuTabs: ["filterMenuTab"],
+          }}
           tooltipShowDelay={0}
           tooltipHideDelay={0}
           enableBrowserTooltips
