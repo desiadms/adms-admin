@@ -1,6 +1,10 @@
 import { Box, Button } from "@mui/joy";
 import { useNavigate } from "@tanstack/react-router";
-import { ColDef } from "ag-grid-community";
+import {
+  ColDef,
+  GetContextMenuItemsParams,
+  MenuItemDef,
+} from "ag-grid-community";
 import { useCallback } from "react";
 import { ProjectsQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
@@ -25,17 +29,37 @@ export function Projects() {
     { field: "location", headerName: "Location" },
     { field: "comment", headerName: "Comment" },
     { field: "contractor", headerName: "Contractor" },
-    { field: "created_at", headerName: "Created At" },
   ] satisfies ColDef<ProjectsQuery["projects"][number]>[];
 
   const handleNavigate = useCallback(
     (params) => {
       if (params?.id) {
         navigate({
-          to: `/projects/$project/edit`,
+          to: `/projects/$project/users`,
           params: { project: params.id.toString() },
         });
       }
+    },
+    [navigate],
+  );
+
+  const getContextMenuItems = useCallback(
+    (params: GetContextMenuItemsParams) => {
+      return [
+        "copy",
+        {
+          name: "Edit Project",
+          action: () => {
+            const id = params.node?.data.id;
+            if (id) {
+              navigate({
+                to: `/projects/$project/edit`,
+                params: { project: id.toString() },
+              });
+            }
+          },
+        },
+      ] satisfies (MenuItemDef | string)[];
     },
     [navigate],
   );
@@ -59,6 +83,7 @@ export function Projects() {
           rowData={data}
           columnDefs={columnDefs}
           handleNavigate={handleNavigate}
+          getContextMenuItems={getContextMenuItems}
         />
       )}
     </Box>

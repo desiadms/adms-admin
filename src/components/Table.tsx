@@ -146,6 +146,7 @@ export function Table<TData extends RequiredTableField>({
   leftChildren,
   rightChildren,
   handleNavigate,
+  getContextMenuItems,
   ...props
 }: ComponentProps<typeof AgGridReact<TData>> &
   Omit<TTableTopToolbar<TData>, "api"> & {
@@ -218,6 +219,7 @@ export function Table<TData extends RequiredTableField>({
           getRowId={getRowId}
           onGridPreDestroyed={onGridPreDestroyed}
           onCellDoubleClicked={onCellDoubleClicked}
+          getContextMenuItems={getContextMenuItems}
           {...props}
         />
       </Box>
