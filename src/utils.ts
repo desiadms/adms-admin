@@ -51,3 +51,7 @@ export function useQuerySub<T, V>(
     error: queryError,
   };
 }
+
+export function convertToEmail(id: string) {
+  return `${id}@desiadms.com`;
+}

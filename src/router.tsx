@@ -57,13 +57,34 @@ const projectEditRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
-const singleProjectUsersRoute = createRoute({
+const singleProjectUsersHomeRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
   path: "users",
+  component: Outlet,
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectUsersRoute = createRoute({
+  getParentRoute: () => singleProjectUsersHomeRoute,
+  path: "/",
   component: lazyRouteComponent(
     () => import("./users/ProjectUsers"),
     "ProjectUsers",
   ),
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectUsersCreateUserRoute = createRoute({
+  getParentRoute: () => singleProjectUsersHomeRoute,
+  path: "create",
+  component: lazyRouteComponent(() => import("./users/Create"), "Create"),
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectUsersEditRoute = createRoute({
+  getParentRoute: () => singleProjectUsersHomeRoute,
+  path: "$user",
+  component: lazyRouteComponent(() => import("./users/Edit"), "Edit"),
   errorComponent: () => "Oh crap!",
 });
 
@@ -87,7 +108,11 @@ const routeTree = rootRoute.addChildren([
     projectCreateRoute,
     singleProjectRoute.addChildren([
       projectEditRoute,
-      singleProjectUsersRoute,
+      singleProjectUsersHomeRoute.addChildren([
+        singleProjectUsersRoute,
+        singleProjectUsersCreateUserRoute,
+        singleProjectUsersEditRoute,
+      ]),
       singleProjectTasksRoute,
     ]),
   ]),

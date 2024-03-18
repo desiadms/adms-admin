@@ -31,9 +31,9 @@ export function EditForm({ project }: { project: ProjectForm }) {
   async function onSubmit(data: ProjectForm) {
     try {
       toast.promise(executeMutation({ variables: { project: data } }), {
-        loading: "Creating project...",
-        success: "Project created",
-        error: "Failed to create project",
+        loading: "Saving Edits...",
+        success: "Edits Saved",
+        error: "Failed to save edits",
       });
     } catch (e) {
       console.error(e);

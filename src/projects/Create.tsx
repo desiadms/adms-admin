@@ -65,7 +65,7 @@ export function Create() {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Typography level="h3">Crate Project</Typography>
+          <Typography level="h3">Create Project</Typography>
           <Divider sx={{ my: 2 }} />
 
           <Box

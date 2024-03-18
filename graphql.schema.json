@@ -59524,18 +59524,6 @@
         "specifiedByURL": null,
         "fields": [
           {
-            "name": "active_project",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "args": [],
@@ -60323,18 +60311,6 @@
             "deprecationReason": null
           },
           {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "INPUT_OBJECT",
-              "name": "uuid_comparison_exp",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "type": {
@@ -60601,18 +60577,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "type": {
@@ -60780,18 +60744,6 @@
         "specifiedByURL": null,
         "fields": [
           {
-            "name": "active_project",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "args": [],
@@ -60853,18 +60805,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "ENUM",
-              "name": "order_by",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "type": {
@@ -60923,18 +60863,6 @@
         "description": "aggregate min on columns",
         "specifiedByURL": null,
         "fields": [
-          {
-            "name": "active_project",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "first_name",
             "description": null,
@@ -60996,18 +60924,6 @@
         "specifiedByURL": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "ENUM",
-              "name": "order_by",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "first_name",
             "description": null,
@@ -61184,18 +61100,6 @@
         "specifiedByURL": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "ENUM",
-              "name": "order_by",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "first_name",
             "description": null,
@@ -61419,12 +61323,6 @@
         "interfaces": null,
         "enumValues": [
           {
-            "name": "active_project",
-            "description": "column name",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": "column name",
             "isDeprecated": false,
@@ -61614,18 +61512,6 @@
         "specifiedByURL": null,
         "fields": null,
         "inputFields": [
-          {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "first_name",
             "description": null,
@@ -61823,18 +61709,6 @@
         "fields": null,
         "inputFields": [
           {
-            "name": "active_project",
-            "description": null,
-            "type": {
-              "kind": "SCALAR",
-              "name": "uuid",
-              "ofType": null
-            },
-            "defaultValue": null,
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "first_name",
             "description": null,
             "type": {
@@ -61992,12 +61866,6 @@
         "inputFields": null,
         "interfaces": null,
         "enumValues": [
-          {
-            "name": "active_project",
-            "description": "column name",
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
           {
             "name": "first_name",
             "description": "column name",

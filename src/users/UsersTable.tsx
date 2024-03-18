@@ -1,8 +1,9 @@
-import { Box } from "@mui/joy";
+import { Box, Button } from "@mui/joy";
 import { ColDef } from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 // AG Grid Component
+import { useNavigate } from "@tanstack/react-router";
 import { UsersQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
 
@@ -16,12 +17,25 @@ export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
     { field: "usersMetadata_user.lastSeen", headerName: "Last Seen" },
     { field: "hire_date", headerName: "Hire Date" },
     { field: "status", headerName: "Status" },
-    { field: "active_project", headerName: "Active Project" },
   ] satisfies ColDef<(typeof data)[number]>[];
+
+  const navigate = useNavigate({ from: "/projects/$project/users/" });
 
   return (
     <Box>
-      <Table rowData={data} columnDefs={columnDefs} />
+      <Table
+        rowData={data}
+        columnDefs={columnDefs}
+        rightChildren={
+          <Button
+            variant="outlined"
+            size="sm"
+            onClick={() => navigate({ to: "/projects/$project/users/create" })}
+          >
+            Create User
+          </Button>
+        }
+      />
     </Box>
   );
 }

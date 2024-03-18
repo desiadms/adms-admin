@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { graphql } from "../graphql";
 import { useQuerySub } from "../utils";
 
@@ -10,13 +11,28 @@ export const queryUsers = graphql(/* GraphQL */ `
       id
       last_name
       status
-      active_project
       usersMetadata_user {
         createdAt
+        disabled
         email
+        metadata
         emailVerified
         lastSeen
       }
+    }
+  }
+`);
+
+export const mutationUpsertUser = graphql(/* GraphQL */ `
+  mutation UpsertUser($user: usersMetadata_insert_input!) {
+    insert_usersMetadata_one(
+      object: $user
+      on_conflict: {
+        constraint: usersMetadata_pkey
+        update_columns: [first_name, hire_date, last_name, status]
+      }
+    ) {
+      id
     }
   }
 `);
@@ -31,10 +47,23 @@ export function useAllUsers() {
   };
 }
 
+type TUserMetadata = {
+  activeProject: string;
+};
+
 export function useProjectUsers() {
   const { project } = useParams({ from: "/projects/$project/users" });
   const { data, loading, error } = useAllUsers();
+  console.log({ data, loading, error, project });
+  const projectUsers = useMemo(
+    () =>
+      data?.filter(
+        (user) =>
+          (user.usersMetadata_user.metadata as unknown as TUserMetadata)
+            .activeProject === project,
+      ),
+    [data, project],
+  );
 
-  const projectUsers = data?.filter((user) => user?.active_project === project);
   return { loading, error, data: projectUsers };
 }

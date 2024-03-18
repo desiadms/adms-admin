@@ -15,15 +15,12 @@ import { useForm } from "react-hook-form";
 import { createApolloClient } from "../graphqlClient";
 import { Dashboard } from "../nav/Dashboard";
 import { useAuth } from "../nhost";
+import { convertToEmail } from "../utils";
 
 type LoginFormData = {
   id: string;
   password: string;
 };
-
-function convertToEmail(id: string) {
-  return `${id}@desiadms.com`;
-}
 
 export function Login() {
   const { signInEmailPassword, isLoading, isError } = useSignInEmailPassword();
