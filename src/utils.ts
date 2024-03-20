@@ -55,3 +55,9 @@ export function useQuerySub<T, V>(
 export function convertToEmail(id: string) {
   return `${id}@desiadms.com`;
 }
+
+export function convertToPin(id: string) {
+  const pin = id.split("@")[0];
+  if (!pin) throw new Error("email cant be converted to pin");
+  return pin;
+}

@@ -115,10 +115,8 @@ export function Create() {
           >
             <InputField
               sx={inputSx}
-              label="user id"
-              {...register("userId", {
-                required: "Email is required",
-              })}
+              label="PIN"
+              {...register("userId")}
               error={errors.userId}
             />
             <InputField

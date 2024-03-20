@@ -6,14 +6,19 @@ import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied
 import { useNavigate } from "@tanstack/react-router";
 import { UsersQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
+import { convertToPin } from "../utils";
 
 export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
   const columnDefs = [
-    { field: "id", headerName: "ID" },
+    { field: "id", headerName: "ID", hide: true },
+    {
+      field: "usersMetadata_user.email",
+      headerName: "Pin",
+      valueFormatter: (params) => convertToPin(params.value),
+    },
     { field: "first_name", headerName: "Name" },
     { field: "last_name", headerName: "Last Name" },
-    { field: "usersMetadata_user.email", headerName: "Email" },
-    { field: "usersMetadata_user.emailVerified", headerName: "Email Verified" },
+
     { field: "usersMetadata_user.lastSeen", headerName: "Last Seen" },
     { field: "hire_date", headerName: "Hire Date" },
     { field: "status", headerName: "Status" },
