@@ -54,7 +54,7 @@ type TUserMetadata = {
 export function useProjectUsers() {
   const { project } = useParams({ from: "/projects/$project/users" });
   const { data, loading, error } = useAllUsers();
-  console.log({ data, loading, error, project });
+
   const projectUsers = useMemo(
     () =>
       data?.filter(

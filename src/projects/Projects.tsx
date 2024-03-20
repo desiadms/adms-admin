@@ -5,7 +5,7 @@ import {
   GetContextMenuItemsParams,
   MenuItemDef,
 } from "ag-grid-community";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { ProjectsQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
 import { TopNav } from "../nav/Components";
@@ -15,21 +15,26 @@ export function Projects() {
   const { data, loading } = useProjects();
   const navigate = useNavigate({ from: "/projects" });
 
-  const columnDefs = [
-    { field: "id", headerName: "ID", hide: true },
-    { field: "name", headerName: "Name" },
-    { field: "poc", headerName: "POC" },
-    {
-      field: "status",
-      headerName: "Status",
-      cellDataType: "text",
-      valueGetter: (params) => (params.data?.status ? "Active" : "Inactive"),
-    },
-    { field: "sub_contractor", headerName: "Sub Contractor" },
-    { field: "location", headerName: "Location" },
-    { field: "comment", headerName: "Comment" },
-    { field: "contractor", headerName: "Contractor" },
-  ] satisfies ColDef<ProjectsQuery["projects"][number]>[];
+  const columnDefs = useMemo(
+    () =>
+      [
+        { field: "id", headerName: "ID", hide: true },
+        { field: "name", headerName: "Name" },
+        { field: "poc", headerName: "POC" },
+        {
+          field: "status",
+          headerName: "Status",
+          cellDataType: "text",
+          valueGetter: (params) =>
+            params.data?.status ? "Active" : "Inactive",
+        },
+        { field: "sub_contractor", headerName: "Sub Contractor" },
+        { field: "location", headerName: "Location" },
+        { field: "comment", headerName: "Comment" },
+        { field: "contractor", headerName: "Contractor" },
+      ] satisfies ColDef<ProjectsQuery["projects"][number]>[],
+    [],
+  );
 
   const handleNavigate = useCallback(
     (params) => {
