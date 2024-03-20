@@ -6,9 +6,12 @@ import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied
 import { useNavigate } from "@tanstack/react-router";
 import { UsersQuery } from "src/__generated__/gql/graphql";
 import { Table } from "../components/Table";
+import { useProjectOptions } from "../projects/hooks";
 import { convertToPin } from "../utils";
 
 export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
+  const projectOptions = useProjectOptions();
+
   const columnDefs = [
     { field: "id", headerName: "ID", hide: true },
     {
@@ -21,7 +24,14 @@ export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
 
     { field: "usersMetadata_user.lastSeen", headerName: "Last Seen" },
     { field: "hire_date", headerName: "Hire Date" },
-    { field: "status", headerName: "Status" },
+    {
+      field: "usersMetadata_user.metadata",
+      headerName: "Active Project",
+      valueFormatter: (params) =>
+        projectOptions.data?.find(
+          ({ value }) => value === params.value?.activeProject,
+        )?.label || "Unemployed",
+    },
   ] satisfies ColDef<(typeof data)[number]>[];
 
   const navigate = useNavigate({ from: "/projects/$project/users/" });
