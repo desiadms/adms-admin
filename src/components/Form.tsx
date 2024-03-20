@@ -50,6 +50,11 @@ type ControllerProps<TFields extends FieldValues> = {
   control: Control<TFields>;
 };
 
+export type SelectFieldOption = {
+  label: string;
+  value: string | null;
+};
+
 export function SelectField<TFields extends FieldValues>({
   name,
   label,
@@ -57,17 +62,18 @@ export function SelectField<TFields extends FieldValues>({
   multiple,
   renderOption,
   control,
-  onChange,
   sx,
+  renderValue,
 }: {
   label: string;
   multiple?: true | undefined;
-  options: string[];
-  onChange?: (value: string[]) => unknown;
-  renderOption?: (_option: string) => string;
+  options: SelectFieldOption[];
+  renderOption?: (_option: SelectFieldOption) => string;
+  renderValue?: ComponentProps<typeof Select>["renderValue"];
   sx?: ComponentProps<typeof FormControl>["sx"];
 } & ControllerProps<TFields>) {
-  const renderOptionFn = renderOption || ((opt: string) => opt);
+  const renderOptionFn =
+    renderOption || ((opt: SelectFieldOption) => opt.label);
   return (
     <FormControl sx={sx}>
       <FormLabel sx={{ textTransform: "capitalize" }}>{label}</FormLabel>
@@ -75,24 +81,18 @@ export function SelectField<TFields extends FieldValues>({
         name={name}
         control={control}
         rules={{ required: `${name} field is required` }}
-        render={({ field: { value, ...props }, fieldState: { error } }) => {
-          const values: string[] =
-            typeof value === "string" ? value.split(",") : value;
+        render={({ field: { value }, fieldState: { error } }) => {
           return (
             <>
               <Select
                 multiple={multiple}
-                value={values}
-                onChange={(_event, newValue) => {
-                  if (newValue?.length !== 0) {
-                    onChange?.(newValue);
-                    props.onChange(newValue);
-                  }
-                }}
+                renderValue={renderValue}
+                defaultValue={value}
               >
                 {options.map((opt) => {
+                  const { value } = opt;
                   return (
-                    <Option key={opt} value={opt}>
+                    <Option key={value} value={value}>
                       {renderOptionFn(opt)}
                     </Option>
                   );

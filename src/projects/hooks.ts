@@ -84,3 +84,22 @@ export function useProject() {
   );
   return { data: project, loading, error };
 }
+
+export function useProjectOptions() {
+  const { data, loading, error } = useProjects();
+  const options = useMemo(() => {
+    const sortedOptions =
+      data
+        ?.map((p) => ({
+          label: p.name,
+          value: p.id,
+        }))
+        .sort((a, b) =>
+          a.label
+            .toLocaleLowerCase()
+            .localeCompare(b.label.toLocaleLowerCase()),
+        ) || [];
+    return [{ label: "Unemployed", value: null }, ...sortedOptions];
+  }, [data]);
+  return { data: options, loading, error };
+}

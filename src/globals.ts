@@ -25,3 +25,10 @@ export const joy4ValueInPx = 32;
 
 // 3 inputs + 2 gaps + left and right padding
 export const maxFormWidth = 260 * 3 + joy4ValueInPx * 2 + joy4ValueInPx * 2;
+
+export type ResObject<E = unknown> = {
+  id: string;
+  error: E | null;
+};
+
+export type TServerResponse<E = unknown> = ResObject<E>[];

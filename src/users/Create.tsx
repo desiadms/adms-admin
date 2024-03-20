@@ -1,67 +1,76 @@
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Divider, Typography } from "@mui/joy";
-import { useSignUpEmailPassword } from "@nhost/react";
 import { useNavigate, useParams } from "@tanstack/react-router";
+import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { InputField } from "../components/Form";
-import { inputSx, maxFormWidth } from "../globals";
+import { TCreateUserBody } from "../../api/createUser.mts";
+import { InputField, SelectField } from "../components/Form";
+import { TServerResponse, inputSx, maxFormWidth } from "../globals";
+import { useProjectOptions } from "../projects/hooks";
 import { convertToEmail } from "../utils";
 import { mutationUpsertUser } from "./hooks";
 import { UserForm, userValidation } from "./utils";
 
 export function Create() {
+  const { project } = useParams({ from: "/projects/$project/users/create" });
+
   const {
     register,
     handleSubmit,
     formState: { errors },
+    control,
   } = useForm<UserForm>({
     resolver: zodResolver(userValidation),
+    defaultValues: {
+      hire_date: dayjs().format("YYYY-MM-DD"),
+      activeProject: project,
+    },
   });
 
-  const { project } = useParams({ from: "/projects/$project/users/create" });
-
-  const {
-    signUpEmailPassword,
-    needsEmailVerification,
-    isLoading,
-    isSuccess,
-    isError,
-    error,
-  } = useSignUpEmailPassword();
-
-  console.log({ needsEmailVerification, isLoading, isSuccess, isError, error });
+  const { data: projectOptions } = useProjectOptions();
   const [executeMutation] = useMutation(mutationUpsertUser);
 
   const navigate = useNavigate({ from: "/projects/create" });
 
   async function onSubmit(data: UserForm) {
-    const { first_name, hire_date, last_name, password, userId } = data;
+    const {
+      first_name,
+      hire_date,
+      last_name,
+      password,
+      userId,
+      activeProject,
+    } = data;
 
     const email = convertToEmail(userId);
     try {
-      const createUser = signUpEmailPassword(email, password).then((res) => {
-        const id = res.user?.id;
+      const createUser = fetch("/api/users/create", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password,
+          activeProject,
+        } satisfies TCreateUserBody),
+      })
+        .then((res) => res.json() as Promise<TServerResponse>)
+        .then((res) => {
+          const id = res?.[0]?.id;
 
-        const error = res.isError;
-        console.log("in hereee", res);
+          if (!id) throw new Error("Cannot find user id in response");
 
-        if (error) {
-          throw new Error(`Failed to create user: ${res.error?.message}`);
-        }
-
-        return executeMutation({
-          variables: {
-            user: {
-              id,
-              first_name,
-              hire_date,
-              last_name,
+          return executeMutation({
+            variables: {
+              user: {
+                id,
+                first_name,
+                hire_date,
+                last_name,
+              },
             },
-          },
+          });
         });
-      });
 
       const res = await toast.promise(createUser, {
         loading: "Creating user...",
@@ -133,10 +142,18 @@ export function Create() {
 
             <InputField
               sx={inputSx}
-              label="hire"
+              label="hire date"
               type="date"
               {...register("hire_date")}
               error={errors.hire_date}
+            />
+            <SelectField
+              sx={inputSx}
+              label="active project"
+              name="activeProject"
+              control={control}
+              options={projectOptions || []}
+              error={errors.activeProject}
             />
           </Box>
 
