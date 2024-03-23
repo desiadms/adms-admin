@@ -209,6 +209,7 @@ export function SidebarLink({
     location: { pathname },
   } = useRouterState();
   return (
+    // @ts-expect-error - react router type
     <Link sx={sideBarLinkStyle} to={to} params={params} search={(prev) => prev}>
       <Box
         sx={{
@@ -289,7 +290,10 @@ function TabsWrapper({
         >
           <Link
             textTransform="capitalize"
+            // @ts-expect-error - react router type
             to={to}
+            // @ts-expect-error - react router type
+            params={params}
             sx={{
               [theme.breakpoints.down("md")]: {
                 width: "100%",
@@ -301,7 +305,6 @@ function TabsWrapper({
                     : theme.palette.neutral[200],
               },
             }}
-            params={params}
             search={true}
           >
             <Typography
@@ -630,9 +633,11 @@ export function SidebarItem({
           color: "inherit",
           width: "100%",
         }}
+        // @ts-expect-error - react router type
         to={path}
-        id={id}
+        // @ts-expect-error - react router type
         params={params}
+        id={id}
         onClick={() => {
           handleClick?.();
         }}

@@ -50,7 +50,7 @@ export function useProjects() {
 
 export function useSingleProjectLinks() {
   const params = useParams({
-    from: "/projects/$project",
+    strict: false,
   });
 
   const links: Parameters<typeof TopNav>[number]["links"] = [
