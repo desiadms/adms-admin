@@ -35,3 +35,4 @@ dist-ssr
 **/__generated__/
 
 .env
+task.json

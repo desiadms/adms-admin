@@ -20,10 +20,8 @@
   },
   "dependencies": {
     "@apollo/client": "^3.9.4",
-    "@emotion/react": "^11.11.3",
+    "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
-    "@headlessui/react": "^1.7.16",
-    "@heroicons/react": "^2.0.18",
     "@hookform/resolvers": "^3.3.4",
     "@mui/joy": "^5.0.0-beta.29",
     "@netlify/functions": "^2.6.0",
