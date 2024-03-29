@@ -8,7 +8,7 @@ import { Box } from "@mui/system";
 import { Outlet } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
 import { GoOrganization } from "react-icons/go";
-import { LuFileClock } from "react-icons/lu";
+import { LuUser } from "react-icons/lu";
 import { useSingleProjectLinks } from "../projects/hooks";
 import { SidebarLink } from "./Components";
 import { useSideBar } from "./hooks";
@@ -120,10 +120,10 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
 
           <Stack onClick={() => onItemClick?.()} gap={1}>
             <SidebarLink
-              id="reports"
-              to="/projects"
-              label="Reports"
-              icon={<LuFileClock size={18} />}
+              id="all-users"
+              to="/users"
+              label="Users"
+              icon={<LuUser size={18} />}
             />
           </Stack>
 

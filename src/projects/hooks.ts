@@ -99,7 +99,7 @@ export function useProjectOptions() {
             .toLocaleLowerCase()
             .localeCompare(b.label.toLocaleLowerCase()),
         ) || [];
-    return [{ label: "Unemployed", value: null }, ...sortedOptions];
+    return [{ label: "Unemployed", value: "unemployed" }, ...sortedOptions];
   }, [data]);
   return { data: options, loading, error };
 }

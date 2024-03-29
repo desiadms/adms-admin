@@ -37,13 +37,31 @@ export const mutationUpsertUser = graphql(/* GraphQL */ `
   }
 `);
 
+export const mutationUpdateUserMetadata = graphql(/* GraphQL */ `
+  mutation UpdateUserMetadata($id: uuid!, $metadata: jsonb!) {
+    updateUser(pk_columns: { id: $id }, _set: { metadata: $metadata }) {
+      id
+    }
+  }
+`);
+
 export function useAllUsers() {
   const { loading, error, data } = useQuerySub(queryUsers);
+
+  const users = useMemo(() => {
+    return data?.usersMetadata.map((user) => ({
+      ...user,
+      usersMetadata_user: {
+        ...user.usersMetadata_user,
+        metadata: user.usersMetadata_user.metadata as unknown as TUserMetadata,
+      },
+    }));
+  }, [data]);
 
   return {
     loading,
     error,
-    data: data?.usersMetadata,
+    data: users,
   };
 }
 
@@ -57,13 +75,24 @@ export function useProjectUsers() {
 
   const projectUsers = useMemo(
     () =>
-      data?.filter(
-        (user) =>
-          (user.usersMetadata_user.metadata as unknown as TUserMetadata)
-            .activeProject === project,
-      ),
+      data?.filter((user) => {
+        return user.usersMetadata_user.metadata?.activeProject === project;
+      }),
     [data, project],
   );
 
   return { loading, error, data: projectUsers };
+}
+
+export function useUser() {
+  const { user: userId } = useParams({
+    from: "/users/$user",
+  });
+  const { data, loading, error } = useAllUsers();
+
+  const projectUser = useMemo(() => {
+    return data?.find((user) => userId === user.id);
+  }, [data, userId]);
+
+  return { loading, error, data: projectUser };
 }

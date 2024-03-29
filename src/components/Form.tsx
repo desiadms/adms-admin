@@ -59,11 +59,11 @@ export function SelectField<TFields extends FieldValues>({
   name,
   label,
   options,
-  multiple,
   renderOption,
   control,
   sx,
   renderValue,
+  defaultValue,
 }: {
   label: string;
   multiple?: true | undefined;
@@ -81,13 +81,15 @@ export function SelectField<TFields extends FieldValues>({
         name={name}
         control={control}
         rules={{ required: `${name} field is required` }}
-        render={({ field: { value }, fieldState: { error } }) => {
+        render={({ fieldState: { error }, field }) => {
           return (
             <>
               <Select
-                multiple={multiple}
                 renderValue={renderValue}
-                defaultValue={value}
+                defaultValue={defaultValue}
+                onChange={(_, data) => {
+                  field.onChange(data);
+                }}
               >
                 {options.map((opt) => {
                   const { value } = opt;

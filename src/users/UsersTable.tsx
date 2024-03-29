@@ -1,16 +1,24 @@
 import { Box, Button } from "@mui/joy";
-import { ColDef } from "ag-grid-community";
+import {
+  ColDef,
+  GetContextMenuItemsParams,
+  MenuItemDef,
+} from "ag-grid-community";
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 // AG Grid Component
 import { useNavigate } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { UsersQuery } from "src/__generated__/gql/graphql";
+import { useCallback, useMemo } from "react";
 import { Table } from "../components/Table";
 import { useProjectOptions } from "../projects/hooks";
 import { convertToPin } from "../utils";
+import { useProjectUsers } from "./hooks";
 
-export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
+export function UsersTable({
+  data,
+}: {
+  data: ReturnType<typeof useProjectUsers>["data"];
+}) {
   const { data: projectOptions } = useProjectOptions();
 
   const columnDefs = useMemo(
@@ -35,22 +43,46 @@ export function UsersTable({ data }: { data: UsersQuery["usersMetadata"] }) {
               ({ value }) => value === params.value?.activeProject,
             )?.label || "Unemployed",
         },
-      ] satisfies ColDef<(typeof data)[number]>[],
+      ] satisfies ColDef<NonNullable<typeof data>[number]>[],
     [projectOptions],
   );
 
-  const navigate = useNavigate({ from: "/projects/$project/users/" });
+  const navigate = useNavigate();
+
+  const getContextMenuItems = useCallback(
+    (params: GetContextMenuItemsParams) => {
+      return [
+        "copy",
+        {
+          name: "Edit User",
+          action: () => {
+            const id = params.node?.data.id;
+            if (id) {
+              return navigate({
+                to: `/users/$user`,
+                params: { user: id.toString() },
+              });
+            }
+          },
+        },
+      ] satisfies (MenuItemDef | string)[];
+    },
+    [navigate],
+  );
 
   return (
     <Box>
       <Table
         rowData={data}
+        getContextMenuItems={getContextMenuItems}
         columnDefs={columnDefs}
         rightChildren={
           <Button
             variant="outlined"
             size="sm"
-            onClick={() => navigate({ to: "/projects/$project/users/create" })}
+            onClick={() => {
+              navigate({ to: "/createUser" });
+            }}
           >
             Create User
           </Button>

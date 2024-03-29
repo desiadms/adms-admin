@@ -1,40 +1,50 @@
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Divider, Typography } from "@mui/joy";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { TCreateUserBody } from "../../api/createUser.mts";
-import { InputField, SelectField } from "../components/Form";
+import { InputField, SelectField, SelectFieldOption } from "../components/Form";
 import { TServerResponse, inputSx, maxFormWidth } from "../globals";
 import { useProjectOptions } from "../projects/hooks";
 import { convertToEmail } from "../utils";
 import { mutationUpsertUser } from "./hooks";
-import { UserForm, userValidation } from "./utils";
+import { CrateUserForm, createUserValidation } from "./utils";
 
 export function Create() {
-  const { project } = useParams({ from: "/projects/$project/users/create" });
+  const { data: projectOptions, error, loading } = useProjectOptions();
 
+  if (loading) return <div>loading</div>;
+  if (error) return <div>error</div>;
+  if (!projectOptions) return <div>no project options</div>;
+
+  return <CreateForm projectOptions={projectOptions} />;
+}
+
+export function CreateForm({
+  projectOptions,
+}: {
+  projectOptions: SelectFieldOption[];
+}) {
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm<UserForm>({
-    resolver: zodResolver(userValidation),
+  } = useForm<CrateUserForm>({
+    resolver: zodResolver(createUserValidation),
     defaultValues: {
       hire_date: dayjs().format("YYYY-MM-DD"),
-      activeProject: project,
+      activeProject: "unemployed",
     },
   });
 
-  const { data: projectOptions } = useProjectOptions();
   const [executeMutation] = useMutation(mutationUpsertUser);
+  const navigate = useNavigate();
 
-  const navigate = useNavigate({ from: "/projects/create" });
-
-  async function onSubmit(data: UserForm) {
+  async function onSubmit(data: CrateUserForm) {
     const {
       first_name,
       hire_date,
@@ -46,12 +56,14 @@ export function Create() {
 
     const email = convertToEmail(userId);
     try {
+      const parsedActiveProject =
+        activeProject === "unemployed" ? null : activeProject;
       const createUser = fetch("/api/users/create", {
         method: "POST",
         body: JSON.stringify({
           email,
           password,
-          activeProject,
+          activeProject: parsedActiveProject,
         } satisfies TCreateUserBody),
       })
         .then((res) => res.json() as Promise<TServerResponse>)
@@ -72,20 +84,22 @@ export function Create() {
           });
         });
 
-      const res = await toast.promise(createUser, {
+      await toast.promise(createUser, {
         loading: "Creating user...",
         success: "User created",
         error: "Failed to create user",
       });
 
-      const userId = res.data?.insert_usersMetadata_one?.id;
-
-      if (!userId) throw new Error("Cannot find project id in response");
-
-      navigate({
-        to: "/projects/$project/users/$user",
-        params: { project, user: userId },
-      });
+      if (parsedActiveProject) {
+        navigate({
+          to: "/projects/$project/users",
+          params: {
+            project: parsedActiveProject,
+          },
+        });
+      } else {
+        navigate({ to: "/users" });
+      }
     } catch (e) {
       console.error(e);
     }
@@ -145,11 +159,13 @@ export function Create() {
               {...register("hire_date")}
               error={errors.hire_date}
             />
+
             <SelectField
               sx={inputSx}
               label="active project"
               name="activeProject"
               control={control}
+              defaultValue="unemployed"
               options={projectOptions || []}
               error={errors.activeProject}
             />

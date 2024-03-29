@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const userValidation = z.object({
+export const createUserValidation = z.object({
   id: z.string().optional(),
   userId: z.string().min(3),
   activeProject: z.string().nullish(),
@@ -10,4 +10,14 @@ export const userValidation = z.object({
   hire_date: z.string().nullish(),
 });
 
-export type UserForm = z.infer<typeof userValidation>;
+export const editUserValidation = z.object({
+  id: z.string(),
+  userId: z.string().min(3),
+  activeProject: z.string().nullish(),
+  first_name: z.string().min(3),
+  last_name: z.string().min(3),
+  hire_date: z.string().nullish(),
+});
+
+export type CrateUserForm = z.infer<typeof createUserValidation>;
+export type EditUserForm = z.infer<typeof editUserValidation>;
