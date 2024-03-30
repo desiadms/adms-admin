@@ -8,7 +8,7 @@ import { Box } from "@mui/system";
 import { Outlet } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
 import { GoOrganization } from "react-icons/go";
-import { LuUser } from "react-icons/lu";
+import { LuFileArchive, LuUser } from "react-icons/lu";
 import { useSingleProjectLinks } from "../projects/hooks";
 import { SidebarLink } from "./Components";
 import { useSideBar } from "./hooks";
@@ -113,7 +113,7 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
             <SidebarLink
               id="all-projects"
               to="/projects"
-              label="All Projects"
+              label="Projects"
               icon={<GoOrganization size={18} />}
             />
           </Stack>
@@ -124,6 +124,14 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
               to="/users"
               label="Users"
               icon={<LuUser size={18} />}
+            />
+          </Stack>
+          <Stack onClick={() => onItemClick?.()} gap={1}>
+            <SidebarLink
+              id="task-report"
+              to="/reports/task-report"
+              label="Task Report"
+              icon={<LuFileArchive size={18} />}
             />
           </Stack>
 

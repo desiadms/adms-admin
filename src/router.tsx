@@ -109,10 +109,57 @@ const singleProjectUsersRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
-const singleProjectTasksRoute = createRoute({
+const singleProjectTaskReportRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
-  path: "tasks",
-  component: () => <div> tasks</div>,
+  path: "task-report",
+  component: () => <div> task report</div>,
+  errorComponent: () => "Oh crap!",
+});
+
+const reportsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "reports",
+  component: () => (
+    <Box>
+      <TopNav
+        links={[
+          {
+            id: "task-report",
+            to: "/reports/task-report",
+            label: "Task Report",
+            params: {},
+          },
+          {
+            id: "user-report",
+            to: "/reports/user-report",
+            label: "User Report",
+            params: {},
+          },
+        ]}
+      />
+      <Outlet />
+    </Box>
+  ),
+  errorComponent: () => "Oh crap!",
+});
+
+const taskReportRoute = createRoute({
+  getParentRoute: () => reportsRoute,
+  path: "task-report",
+  component: lazyRouteComponent(
+    () => import("./reports/TaskReportTable"),
+    "TaskReportTable",
+  ),
+  errorComponent: () => "Oh crap!",
+});
+
+const userReportRoute = createRoute({
+  getParentRoute: () => reportsRoute,
+  path: "user-report",
+  component: lazyRouteComponent(
+    () => import("./reports/UserReportTable"),
+    "UserReportTable",
+  ),
   errorComponent: () => "Oh crap!",
 });
 
@@ -125,6 +172,7 @@ declare module "@tanstack/react-router" {
 const routeTree = rootRoute.addChildren([
   homeRoute,
   createUsersFromAllUsersRoute,
+  reportsRoute.addChildren([taskReportRoute, userReportRoute]),
   usersRoute.addChildren([usersRouteHome, editUserRoute]),
   projectsRoute.addChildren([
     projectsHomeRoute,
@@ -132,7 +180,7 @@ const routeTree = rootRoute.addChildren([
     singleProjectRoute.addChildren([
       projectEditRoute,
       singleProjectUsersHomeRoute.addChildren([singleProjectUsersRoute]),
-      singleProjectTasksRoute,
+      singleProjectTaskReportRoute,
     ]),
   ]),
 ]);

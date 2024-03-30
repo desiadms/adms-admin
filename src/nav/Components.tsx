@@ -209,7 +209,6 @@ export function SidebarLink({
     location: { pathname },
   } = useRouterState();
   return (
-    // @ts-expect-error - react router type
     <Link sx={sideBarLinkStyle} to={to} params={params} search={(prev) => prev}>
       <Box
         sx={{
@@ -290,9 +289,7 @@ function TabsWrapper({
         >
           <Link
             textTransform="capitalize"
-            // @ts-expect-error - react router type
             to={to}
-            // @ts-expect-error - react router type
             params={params}
             sx={{
               [theme.breakpoints.down("md")]: {
