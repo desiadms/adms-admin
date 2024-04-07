@@ -153,9 +153,11 @@ export function useTreeRemoval() {
   const { taskId } = useParams({
     from: "/projects/$project/task-report/tree-removal/$taskId",
   });
-  return useQuerySub(queryTreeRemoval, {
+  const { data, loading, error } = useQuerySub(queryTreeRemoval, {
     variables: {
       id: taskId,
     },
   });
+
+  return { data: data?.tasks_tree_removal_by_pk, loading, error };
 }
