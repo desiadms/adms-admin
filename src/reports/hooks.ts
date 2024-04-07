@@ -1,3 +1,4 @@
+import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { graphql } from "../graphql";
 import { objectEntries, useQuerySub } from "../utils";
@@ -8,14 +9,17 @@ export const queryTasksLatLon = graphql(/* GraphQL */ `
       id
       latitude
       longitude
+      project_id
     }
     tasks_disposal {
       id
       latitude
       longitude
+      project_id
     }
     tasks_stump_removal {
       id
+      project_id
       tasks_stump_removal_images {
         id
         latitude
@@ -26,9 +30,11 @@ export const queryTasksLatLon = graphql(/* GraphQL */ `
       id
       latitude
       longitude
+      project_id
     }
     tasks_tree_removal {
       id
+      project_id
       tasks_tree_removal_images {
         id
         latitude
@@ -53,6 +59,7 @@ export function useTasksLatLon() {
                   return {
                     taskId: task.id,
                     id: stumpRemovalImage.id,
+                    projectId: task.project_id,
                     latitude: stumpRemovalImage.latitude,
                     longitude: stumpRemovalImage.longitude,
                   };
@@ -73,6 +80,7 @@ export function useTasksLatLon() {
                 return {
                   taskId: task.id,
                   id: treeRemovalImage.id,
+                  projectId: task.project_id,
                   latitude: treeRemovalImage.latitude,
                   longitude: treeRemovalImage.longitude,
                 };
@@ -103,6 +111,7 @@ export function useTasksLatLon() {
               return {
                 taskId: task.id,
                 id: task.id,
+                projectId: task.project_id,
                 latitude: task.latitude,
                 longitude: task.longitude,
               };
@@ -113,5 +122,40 @@ export function useTasksLatLon() {
       .filter(Boolean);
   }, [data]);
 
+  console.log(flattenedTasksWithImages);
+
   return { loading, data: flattenedTasksWithImages, error };
+}
+
+export const queryTreeRemoval = graphql(/* GraphQL */ `
+  query TreeRemoval($id: uuid!) {
+    tasks_tree_removal_by_pk(id: $id) {
+      id
+      project_id
+      comment
+      completed
+      created_at
+      tasks_tree_removal_images {
+        id
+        latitude
+        longitude
+        taken_at_step
+        task_id
+        updated_at
+        user_id
+        created_at
+      }
+    }
+  }
+`);
+
+export function useTreeRemoval() {
+  const { taskId } = useParams({
+    from: "/projects/$project/task-report/tree-removal/$taskId",
+  });
+  return useQuerySub(queryTreeRemoval, {
+    variables: {
+      id: taskId,
+    },
+  });
 }

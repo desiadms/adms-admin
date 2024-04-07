@@ -112,7 +112,24 @@ const singleProjectUsersRoute = createRoute({
 const singleProjectTaskReportRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
   path: "task-report",
+  component: Outlet,
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectTaskReportHomeRoute = createRoute({
+  getParentRoute: () => singleProjectTaskReportRoute,
+  path: "/",
   component: () => <div> task report</div>,
+  errorComponent: () => "Oh crap!",
+});
+
+const treeRemovalTaskRoute = createRoute({
+  getParentRoute: () => singleProjectTaskReportRoute,
+  path: "tree-removal/$taskId",
+  component: lazyRouteComponent(
+    () => import("./reports/TreeRemovalTask"),
+    "TreeRemovalTask",
+  ),
   errorComponent: () => "Oh crap!",
 });
 
@@ -180,7 +197,10 @@ const routeTree = rootRoute.addChildren([
     singleProjectRoute.addChildren([
       projectEditRoute,
       singleProjectUsersHomeRoute.addChildren([singleProjectUsersRoute]),
-      singleProjectTaskReportRoute,
+      singleProjectTaskReportRoute.addChildren([
+        singleProjectTaskReportHomeRoute,
+        treeRemovalTaskRoute,
+      ]),
     ]),
   ]),
 ]);
