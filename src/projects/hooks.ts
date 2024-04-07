@@ -56,6 +56,12 @@ export function useSingleProjectLinks() {
   const links: Parameters<typeof TopNav>[number]["links"] = [
     { id: "users", to: "/projects/$project/users", label: "Users", params },
     {
+      id: "ticketing-names",
+      to: "/projects/$project/ticketing-names",
+      label: "Ticketing Names",
+      params,
+    },
+    {
       id: "tasks",
       to: "/projects/$project/task-report",
       label: "Tasks",

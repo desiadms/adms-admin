@@ -42,9 +42,9 @@ export const InputField = forwardRef<
   );
 });
 
-type ControllerProps<TFields extends FieldValues> = {
+type ControllerProps<TFields extends FieldValues, DV> = {
   name: Path<TFields>;
-  defaultValue?: string;
+  defaultValue?: DV | undefined;
   rules?: RegisterOptions;
   error?: FieldError;
   control: Control<TFields>;
@@ -55,7 +55,7 @@ export type SelectFieldOption = {
   value: string | null;
 };
 
-export function SelectField<TFields extends FieldValues>({
+export function SelectField<TFields extends FieldValues, DV>({
   name,
   label,
   options,
@@ -71,7 +71,7 @@ export function SelectField<TFields extends FieldValues>({
   renderOption?: (_option: SelectFieldOption) => string;
   renderValue?: ComponentProps<typeof Select>["renderValue"];
   sx?: ComponentProps<typeof FormControl>["sx"];
-} & ControllerProps<TFields>) {
+} & ControllerProps<TFields, DV>) {
   const renderOptionFn =
     renderOption || ((opt: SelectFieldOption) => opt.label);
   return (
@@ -109,7 +109,7 @@ export function SelectField<TFields extends FieldValues>({
   );
 }
 
-export function SwitchField<TFields extends FieldValues>({
+export function SwitchField<TFields extends FieldValues, DV>({
   name,
   label,
   control,
@@ -117,7 +117,7 @@ export function SwitchField<TFields extends FieldValues>({
 }: {
   onChange?: (value: boolean) => unknown;
   label: string;
-} & ControllerProps<TFields>) {
+} & ControllerProps<TFields, DV>) {
   return (
     <FormControl>
       <Controller
@@ -149,7 +149,7 @@ export function SwitchField<TFields extends FieldValues>({
   );
 }
 
-export function PrettySwitchField<TFields extends FieldValues>({
+export function PrettySwitchField<TFields extends FieldValues, DV>({
   name,
   control,
   onChange,
@@ -161,7 +161,7 @@ export function PrettySwitchField<TFields extends FieldValues>({
   label: string | ((value: boolean) => string);
   slotProps?: ComponentProps<typeof Switch>["slotProps"];
   color?: ComponentProps<typeof Switch>["color"];
-} & ControllerProps<TFields>) {
+} & ControllerProps<TFields, DV>) {
   return (
     <FormControl>
       <Controller

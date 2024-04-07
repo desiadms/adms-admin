@@ -123,6 +123,40 @@ const singleProjectTaskReportHomeRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
+const singleProjectTicketingNamesRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "ticketing-names",
+  component: Outlet,
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectTicketingNamesHomeRoute = createRoute({
+  getParentRoute: () => singleProjectTicketingNamesRoute,
+  path: "/",
+  component: lazyRouteComponent(
+    () => import("./ticketing-names/Table"),
+    "TicketingTable",
+  ),
+  errorComponent: () => "Oh crap!",
+});
+
+const singleProjectEditTicketingNameCreateRoute = createRoute({
+  getParentRoute: () => singleProjectTicketingNamesRoute,
+  path: "create",
+  component: lazyRouteComponent(
+    () => import("./ticketing-names/Create"),
+    "Create",
+  ),
+  errorComponent: () => "Oh crap!: singleProjectEditTicketingNameCreateRoute",
+});
+
+const singleProjectEditTicketingNameRoute = createRoute({
+  getParentRoute: () => singleProjectTicketingNamesRoute,
+  path: "$ticketingId",
+  component: lazyRouteComponent(() => import("./ticketing-names/Edit"), "Edit"),
+  errorComponent: () => "Oh crap!: singleProjectEditTicketingNameRoute",
+});
+
 const treeRemovalTaskRoute = createRoute({
   getParentRoute: () => singleProjectTaskReportRoute,
   path: "tree-removal/$taskId",
@@ -200,6 +234,11 @@ const routeTree = rootRoute.addChildren([
       singleProjectTaskReportRoute.addChildren([
         singleProjectTaskReportHomeRoute,
         treeRemovalTaskRoute,
+      ]),
+      singleProjectTicketingNamesRoute.addChildren([
+        singleProjectTicketingNamesHomeRoute,
+        singleProjectEditTicketingNameCreateRoute,
+        singleProjectEditTicketingNameRoute,
       ]),
     ]),
   ]),
