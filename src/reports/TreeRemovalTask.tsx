@@ -14,5 +14,9 @@ export function TreeRemovalTask() {
   // https://docs.nhost.io/reference/javascript/storage/get-presigned-url
 
   console.log(data);
-  return <Box>{JSON.stringify(data)}</Box>;
+  return (
+    <Box>
+      <pre>{JSON.stringify(data, null, "\t")}</pre>
+    </Box>
+  );
 }
