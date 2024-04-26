@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import { nhost } from "../nhost";
 
 export function TaskCard({ imageData }) {
-  const [url, setUrl] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
-    const fetchUrl = async () => {
+    const fetchImageUrl = async () => {
       const { presignedUrl, error } = await nhost.storage.getPresignedUrl({
         fileId: imageData["id"],
       });
@@ -15,11 +15,11 @@ export function TaskCard({ imageData }) {
       if (error) {
         throw error;
       } else {
-        setUrl(presignedUrl.url);
+        setImageUrl(presignedUrl.url);
       }
     };
 
-    fetchUrl();
+    fetchImageUrl();
   }, [imageData]);
 
   const createdAtDate: Date = new Date(imageData["created_at"]);
@@ -37,10 +37,7 @@ export function TaskCard({ imageData }) {
 
   return (
     <Card sx={{ width: 320 }}>
-      <Typography level="h4" component="h4">
-        {imageData["taken_at_step"]} task completion
-      </Typography>
-      <img src={url}></img>
+      <img src={imageUrl}></img>
       <Typography level="body-sm">
         Taken on {dateString}
         <br /> ({imageData.latitude},{imageData.longitude})

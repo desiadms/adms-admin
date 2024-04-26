@@ -1,14 +1,22 @@
+import { TaskCardSection } from "./TaskCardSection";
 import { useTreeRemoval } from "./hooks";
-import { TaskCard } from "./TaskCard";
+
+const takenAtSteps = ["Before", "During", "After"];
 
 export function TreeRemovalTask() {
   const { data } = useTreeRemoval();
   if (data) {
-    const images = data["tasks_tree_removal_images"].map((imageData) => {
-      return <TaskCard imageData={imageData} key={imageData.id}></TaskCard>;
+    const treeRemovalTask = takenAtSteps.map((takenAtStep) => {
+      return (
+        <TaskCardSection
+          data={data}
+          takenAtStep={takenAtStep}
+        ></TaskCardSection>
+      );
     });
-    return <>{images}</>;
+
+    return <>{treeRemovalTask}</>;
   } else {
-    return <>"no data"</>;
+    return <>error: no data</>;
   }
 }
