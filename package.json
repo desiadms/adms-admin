@@ -33,7 +33,7 @@
     "ag-grid-react": "^31.3.1",
     "axios": "^1.6.8",
     "classnames": "^2.5.1",
-    "core-js": "^3.37.0",
+    "core-js": "3.19.3",
     "dayjs": "^1.11.11",
     "graphql": "^16.8.1",
     "jotai": "^2.8.0",
