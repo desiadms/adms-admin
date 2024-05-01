@@ -20,7 +20,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@apollo/client": "^3.10.1",
+    "@apollo/client": "^3.9.9",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@hookform/resolvers": "^3.3.4",
