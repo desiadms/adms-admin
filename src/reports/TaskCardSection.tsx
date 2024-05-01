@@ -25,7 +25,7 @@ export function TaskCardSection({ data, takenAtStep }: TTaskCardSection) {
       >
         {takenAtStep}
       </Typography>
-      {images}
+      <Box sx={{ display: "flex", gap: 5 }}>{images}</Box>
     </Box>
   );
 }

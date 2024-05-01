@@ -1,9 +1,9 @@
 import Card from "@mui/joy/Card";
 import Typography from "@mui/joy/Typography";
 import { useEffect, useState } from "react";
-import { TreeRemovalQuery } from "src/__generated__/gql/graphql";
-import { formatDate } from "src/utils";
+import { TreeRemovalQuery } from "../__generated__/gql/graphql";
 import { nhost } from "../nhost";
+import { formatDate } from "../utils";
 
 type TImageData = NonNullable<
   TreeRemovalQuery["tasks_tree_removal_by_pk"]
@@ -36,7 +36,14 @@ export function TaskCard({ imageData }: { imageData: TImageData }) {
   const imageUrl = useFetchImages(imageData);
 
   return (
-    <Card sx={{ width: 320 }}>
+    <Card
+      sx={{
+        width: 320,
+        display: "flex",
+        justifyContent: "space-between",
+        flexDirection: "column",
+      }}
+    >
       <img src={imageUrl}></img>
       <Typography level="body-sm">
         Taken on {dateString}

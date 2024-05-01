@@ -8,6 +8,7 @@ export function TreeRemovalTask() {
     const treeRemovalTask = takenAtSteps.map((takenAtStep) => {
       return (
         <TaskCardSection
+          key={takenAtStep}
           data={data}
           takenAtStep={takenAtStep}
         ></TaskCardSection>
