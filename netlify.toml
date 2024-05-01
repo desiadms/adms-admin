@@ -1,5 +1,5 @@
 [build]
-  command = "bun netlify build"
+  command = "bun run build"
   publish = "dist"
 
 [dev]
