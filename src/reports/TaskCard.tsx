@@ -1,9 +1,15 @@
 import Card from "@mui/joy/Card";
 import Typography from "@mui/joy/Typography";
 import { useEffect, useState } from "react";
+import { TreeRemovalQuery } from "src/__generated__/gql/graphql";
+import { formatDate } from "src/utils";
 import { nhost } from "../nhost";
 
-export function TaskCard({ imageData }) {
+type TImageData = NonNullable<
+  TreeRemovalQuery["tasks_tree_removal_by_pk"]
+>["tasks_tree_removal_images"][number];
+
+function useFetchImages(imageData: TImageData) {
   const [imageUrl, setImageUrl] = useState("");
 
   useEffect(() => {
@@ -22,18 +28,12 @@ export function TaskCard({ imageData }) {
     fetchImageUrl();
   }, [imageData]);
 
-  const createdAtDate: Date = new Date(imageData["created_at"]);
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    hour: "numeric",
-    minute: "numeric",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    timeZoneName: "short",
-  };
-  const dateString = new Intl.DateTimeFormat("en-US", dateOptions).format(
-    createdAtDate,
-  );
+  return imageUrl;
+}
+
+export function TaskCard({ imageData }: { imageData: TImageData }) {
+  const dateString = formatDate(imageData["created_at"]);
+  const imageUrl = useFetchImages(imageData);
 
   return (
     <Card sx={{ width: 320 }}>

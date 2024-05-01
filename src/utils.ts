@@ -101,3 +101,20 @@ export type ObjectEntry<T> = {
 export const objectEntries = Object.entries as <T>(
   o: T,
 ) => Array<ObjectEntry<T>>;
+
+export function formatDate(utcDate: string) {
+  const createdAtDate: Date = new Date(utcDate);
+  const dateOptions: Intl.DateTimeFormatOptions = {
+    hour: "numeric",
+    minute: "numeric",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+    timeZoneName: "short",
+  };
+  const dateString = new Intl.DateTimeFormat("en-US", dateOptions).format(
+    createdAtDate,
+  );
+
+  return dateString;
+}

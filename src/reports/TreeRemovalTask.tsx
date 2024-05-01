@@ -1,7 +1,6 @@
 import { TaskCardSection } from "./TaskCardSection";
 import { useTreeRemoval } from "./hooks";
-
-const takenAtSteps = ["Before", "During", "After"];
+import { takenAtSteps } from "./shared";
 
 export function TreeRemovalTask() {
   const { data } = useTreeRemoval();
