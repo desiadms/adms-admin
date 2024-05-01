@@ -630,9 +630,7 @@ export function SidebarItem({
           color: "inherit",
           width: "100%",
         }}
-        // @ts-expect-error - react router type
         to={path}
-        // @ts-expect-error - react router type
         params={params}
         id={id}
         onClick={() => {

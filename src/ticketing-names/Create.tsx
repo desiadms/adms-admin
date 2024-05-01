@@ -49,7 +49,7 @@ export function Create() {
       if (!ticketingId) throw new Error("Cannot find ticketing id in response");
 
       navigate({
-        to: "/projects/$project/ticketing-names/",
+        to: "/projects/$project/ticketing-names",
         params: { project },
       });
     } catch (e) {
