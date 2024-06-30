@@ -1,7 +1,7 @@
 import { Config, Context } from "@netlify/functions";
 import { SignUpResponse } from "@nhost/hasura-auth-js";
 import { TServerResponse } from "../src/globals";
-import { nhostURL } from "./common.mts";
+import { nhostURL } from "./common";
 
 export type TCreateUserBody = {
   email: string;
