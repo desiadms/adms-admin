@@ -9,10 +9,17 @@
   port = 5173
   publish = "dist"
 
+[functions]
+  directory = "api"
+
+[[redirects]]
+  from = "/api/*"
+  to = "/api/:splat"
+  status = 200
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-[functions]
-  directory = "api"
+
