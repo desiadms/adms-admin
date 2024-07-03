@@ -11,14 +11,14 @@ import {
 } from "react-leaflet";
 import LinkRouter from "../components/Link";
 import { headerHeight } from "../globals";
-import { useTasksLatLon } from "../reports/hooks";
+import { useAllTasksByProject } from "../reports/hooks";
 
 const USALatLng = [37.0902, -95.712] satisfies LatLngTuple;
 const center = USALatLng;
 
 // create a market per grupedTask
 
-type TGroupedTasks = ReturnType<typeof useTasksLatLon>["data"];
+type TGroupedTasks = ReturnType<typeof useAllTasksByProject>["data"];
 
 const _markers = {
   tasks_stump_removal:
@@ -31,6 +31,7 @@ const _markers = {
 } as const satisfies { [K in TGroupedTasks[number]["key"]]: string };
 
 export function Leaflet({ groupedTasks }: { groupedTasks: TGroupedTasks }) {
+  console.log("in here??");
   return (
     <Box sx={{ position: "relative" }}>
       <Box></Box>

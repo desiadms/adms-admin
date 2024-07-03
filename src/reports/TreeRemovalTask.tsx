@@ -1,9 +1,9 @@
 import { TaskCardSection } from "./TaskCardSection";
-import { useTreeRemoval } from "./hooks";
+import { useTreeRemovalTask } from "./hooks";
 import { takenAtSteps } from "./shared";
 
 export function TreeRemovalTask() {
-  const { data } = useTreeRemoval();
+  const { data } = useTreeRemovalTask();
   if (data) {
     const treeRemovalTask = takenAtSteps.map((takenAtStep) => {
       return (

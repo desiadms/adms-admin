@@ -3,49 +3,75 @@ import { useMemo } from "react";
 import { graphql } from "../graphql";
 import { objectEntries, useQuerySub } from "../utils";
 
-export const queryTasksLatLon = graphql(/* GraphQL */ `
-  query TasksLatLon {
-    tasks_collection {
+export const queryAllTasksByProject = graphql(/* GraphQL */ `
+  query AllTasksByProject($project_id: uuid!) {
+    tasks_collection(where: { project_id: { _eq: $project_id } }) {
       id
       latitude
       longitude
       project_id
+      created_at
     }
-    tasks_disposal {
+    tasks_disposal(where: { project_id: { _eq: $project_id } }) {
       id
       latitude
       longitude
       project_id
+      created_at
     }
-    tasks_stump_removal {
+    tasks_stump_removal(where: { project_id: { _eq: $project_id } }) {
       id
       project_id
+      created_at
+      user_id
       tasks_stump_removal_images {
         id
         latitude
         longitude
+        created_at
+        taken_at_step
       }
     }
-    tasks_ticketing {
+    tasks_ticketing(where: { project_id: { _eq: $project_id } }) {
       id
       latitude
       longitude
       project_id
+      created_at
+      user_id
+      task_ticketing_name {
+        name
+      }
+      images {
+        id
+        latitude
+        longitude
+        created_at
+      }
     }
-    tasks_tree_removal {
+    tasks_tree_removal(where: { project_id: { _eq: $project_id } }) {
       id
       project_id
+      created_at
+      user_id
       tasks_tree_removal_images {
         id
         latitude
         longitude
+        created_at
+        taken_at_step
       }
     }
   }
 `);
 
-export function useTasksLatLon() {
-  const { loading, data, error } = useQuerySub(queryTasksLatLon);
+export function useAllTasksByProject(projectId: string) {
+  const { loading, data, error } = useQuerySub(queryAllTasksByProject, {
+    variables: {
+      project_id: projectId,
+    },
+    skip: !projectId,
+  });
 
   const flattenedTasksWithImages = useMemo(() => {
     if (!data) return [];
@@ -58,6 +84,7 @@ export function useTasksLatLon() {
                 (stumpRemovalImage) => {
                   return {
                     taskId: task.id,
+                    taskName: "Stump Removal",
                     id: stumpRemovalImage.id,
                     projectId: task.project_id,
                     latitude: stumpRemovalImage.latitude,
@@ -79,6 +106,7 @@ export function useTasksLatLon() {
               return task.tasks_tree_removal_images.map((treeRemovalImage) => {
                 return {
                   taskId: task.id,
+                  taskName: "Tree Removal",
                   id: treeRemovalImage.id,
                   projectId: task.project_id,
                   latitude: treeRemovalImage.latitude,
@@ -93,23 +121,37 @@ export function useTasksLatLon() {
             key,
             tasks: allImageCoordinates,
           };
-        } else if (
-          key === "tasks_collection" ||
-          key === "tasks_disposal" ||
-          key === "tasks_ticketing"
-        ) {
-          const label =
-            key === "tasks_collection"
-              ? "Collection"
-              : key === "tasks_disposal"
-              ? "Disposal"
-              : "Ticketing";
+        } else if (key === "tasks_ticketing") {
+          const allImageCoordinates = tasks
+            ?.map((task) => {
+              return task.images.map((taskTicketingImages) => {
+                return {
+                  taskId: task.id,
+                  taskName: task.task_ticketing_name?.name,
+                  id: taskTicketingImages.id,
+                  projectId: task.project_id,
+                  latitude: taskTicketingImages.latitude,
+                  longitude: taskTicketingImages.longitude,
+                };
+              });
+            })
+            .flat();
+
+          return {
+            label: "Task Ticketing",
+            key,
+            tasks: allImageCoordinates,
+          };
+        } else if (key === "tasks_collection" || key === "tasks_disposal") {
+          const label = key === "tasks_collection" ? "Collection" : "Disposal";
+
           return {
             label: label,
             key,
             tasks: tasks.map((task) => {
               return {
                 taskId: task.id,
+                taskName: label,
                 id: task.id,
                 projectId: task.project_id,
                 latitude: task.latitude,
@@ -122,7 +164,7 @@ export function useTasksLatLon() {
       .filter(Boolean);
   }, [data]);
 
-  console.log(flattenedTasksWithImages);
+  console.log("hello", flattenedTasksWithImages);
 
   return { loading, data: flattenedTasksWithImages, error };
 }
@@ -149,7 +191,27 @@ export const queryTreeRemoval = graphql(/* GraphQL */ `
   }
 `);
 
-export function useTreeRemoval() {
+export const queryTicketingTask = graphql(/* GraphQL */ `
+  query TaskTicketing($id: uuid!) {
+    tasks_ticketing_by_pk(id: $id) {
+      comment
+      created_at
+      id
+      images {
+        created_at
+        id
+        latitude
+        longitude
+      }
+      task_ticketing_name {
+        name
+        comment
+      }
+    }
+  }
+`);
+
+export function useTreeRemovalTask() {
   const { taskId } = useParams({
     from: "/projects/$project/task-report/tree-removal/$taskId",
   });
@@ -160,4 +222,17 @@ export function useTreeRemoval() {
   });
 
   return { data: data?.tasks_tree_removal_by_pk, loading, error };
+}
+
+export function useTicketingTask() {
+  const { taskId } = useParams({
+    from: "/projects/$project/task-report/ticketing/$taskId",
+  });
+  const { data, loading, error } = useQuerySub(queryTicketingTask, {
+    variables: {
+      id: taskId,
+    },
+  });
+
+  return { data: data?.tasks_ticketing_by_pk, loading, error };
 }
