@@ -130,7 +130,7 @@ export function UserTasks() {
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 4 }}>
       {data.map((ticket) => (
-        <Printable ticket={ticket} />
+        <Printable key={ticket.id} ticket={ticket} />
       ))}
     </Box>
   );
