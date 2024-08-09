@@ -1,7 +1,89 @@
 import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
+import { AllTasksByProjectQuery } from "../__generated__/gql/graphql";
 import { graphql } from "../graphql";
 import { objectEntries, useQuerySub } from "../utils";
+
+export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
+  query AllTasksByProjectAndUser($project_id: uuid!, $user_id: uuid!) {
+    tasks_collection(
+      where: {
+        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+      }
+    ) {
+      id
+      comment
+      latitude
+      longitude
+      project_id
+      created_at
+    }
+    tasks_disposal(
+      where: {
+        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+      }
+    ) {
+      id
+      comment
+      latitude
+      longitude
+      project_id
+      created_at
+    }
+    tasks_stump_removal(
+      where: {
+        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+      }
+    ) {
+      id
+      comment
+      project_id
+      created_at
+      user_id
+      tasks_stump_removal_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
+    }
+    tasks_ticketing(
+      where: {
+        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+      }
+    ) {
+      id
+      latitude
+      longitude
+      comment
+      project_id
+      created_at
+      user_id
+      task_ticketing_name {
+        name
+      }
+    }
+    tasks_tree_removal(
+      where: {
+        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+      }
+    ) {
+      id
+      project_id
+      created_at
+      comment
+      user_id
+      tasks_tree_removal_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
+    }
+  }
+`);
 
 export const queryAllTasksByProject = graphql(/* GraphQL */ `
   query AllTasksByProject($project_id: uuid!) {
@@ -65,15 +147,8 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
   }
 `);
 
-export function useAllTasksByProject(projectId: string) {
-  const { loading, data, error } = useQuerySub(queryAllTasksByProject, {
-    variables: {
-      project_id: projectId,
-    },
-    skip: !projectId,
-  });
-
-  const flattenedTasksWithImages = useMemo(() => {
+function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
+  return useMemo(() => {
     if (!data) return [];
     return objectEntries(data)
       .map(([key, tasks]) => {
@@ -163,8 +238,51 @@ export function useAllTasksByProject(projectId: string) {
       })
       .filter(Boolean);
   }, [data]);
+}
 
-  console.log("hello", flattenedTasksWithImages);
+export function useAllTasksByProjectAndUser(projectId: string, userId: string) {
+  const { loading, data, error } = useQuerySub(queryAllTasksByProjectAndUser, {
+    variables: {
+      project_id: projectId,
+      user_id: userId,
+    },
+    skip: !projectId || !userId,
+  });
+
+  const flattendTasks = Object.entries(data || {}).flatMap(([key, tasks]) => {
+    if (tasks === "query_root") return [];
+    return tasks.map((task) => {
+      const { latitude, longitude } = {
+        latitude:
+          task.latitude ??
+          (task.tasks_stump_removal_images?.[0]?.latitude ||
+            task.tasks_tree_removal_images?.[0]?.latitude),
+        longitude:
+          task.longitude ??
+          (task.tasks_stump_removal_images?.[0]?.longitude ||
+            task.tasks_tree_removal_images?.[0]?.longitude),
+      };
+      return {
+        ...task,
+        latitude,
+        longitude,
+        key,
+      };
+    });
+  });
+
+  return { loading, data: flattendTasks, error };
+}
+
+export function useAllTasksByProject(projectId: string) {
+  const { loading, data, error } = useQuerySub(queryAllTasksByProject, {
+    variables: {
+      project_id: projectId,
+    },
+    skip: !projectId,
+  });
+
+  const flattenedTasksWithImages = useFlattenTasksWithImages(data);
 
   return { loading, data: flattenedTasksWithImages, error };
 }

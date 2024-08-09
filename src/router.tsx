@@ -109,6 +109,13 @@ const singleProjectUsersRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
+const singleProjectUserTasksRoute = createRoute({
+  getParentRoute: () => singleProjectUsersHomeRoute,
+  path: "$user/tasks",
+  component: lazyRouteComponent(() => import("./users/UserTasks"), "UserTasks"),
+  errorComponent: () => "Oh crap!",
+});
+
 const singleProjectTaskReportRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
   path: "task-report",
@@ -180,53 +187,6 @@ const ticketingTaskRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
-const reportsRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "reports",
-  component: () => (
-    <Box>
-      <TopNav
-        links={[
-          {
-            id: "task-report",
-            to: "/reports/task-report",
-            label: "Task Report",
-            params: {},
-          },
-          {
-            id: "user-report",
-            to: "/reports/user-report",
-            label: "User Report",
-            params: {},
-          },
-        ]}
-      />
-      <Outlet />
-    </Box>
-  ),
-  errorComponent: () => "Oh crap!",
-});
-
-const taskReportRoute = createRoute({
-  getParentRoute: () => reportsRoute,
-  path: "task-report",
-  component: lazyRouteComponent(
-    () => import("./reports/TaskReportTable"),
-    "TaskReportTable",
-  ),
-  errorComponent: () => "Oh crap!",
-});
-
-const userReportRoute = createRoute({
-  getParentRoute: () => reportsRoute,
-  path: "user-report",
-  component: lazyRouteComponent(
-    () => import("./reports/UserReportTable"),
-    "UserReportTable",
-  ),
-  errorComponent: () => "Oh crap!",
-});
-
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -236,14 +196,16 @@ declare module "@tanstack/react-router" {
 const routeTree = rootRoute.addChildren([
   homeRoute,
   createUsersFromAllUsersRoute,
-  reportsRoute.addChildren([taskReportRoute, userReportRoute]),
   usersRoute.addChildren([usersRouteHome, editUserRoute]),
   projectsRoute.addChildren([
     projectsHomeRoute,
     projectCreateRoute,
     singleProjectRoute.addChildren([
       projectEditRoute,
-      singleProjectUsersHomeRoute.addChildren([singleProjectUsersRoute]),
+      singleProjectUsersHomeRoute.addChildren([
+        singleProjectUsersRoute,
+        singleProjectUserTasksRoute,
+      ]),
       singleProjectTaskReportRoute.addChildren([
         singleProjectTaskReportHomeRoute,
         treeRemovalTaskRoute,

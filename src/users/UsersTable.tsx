@@ -7,7 +7,7 @@ import {
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 // AG Grid Component
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 import { Table } from "../components/Table";
 import { useProjectOptions } from "../projects/hooks";
@@ -20,6 +20,7 @@ export function UsersTable({
   data: ReturnType<typeof useProjectUsers>["data"];
 }) {
   const { data: projectOptions } = useProjectOptions();
+  const { project } = useParams({ from: "/projects/$project/users" });
 
   const columnDefs = useMemo(
     () =>
@@ -65,9 +66,21 @@ export function UsersTable({
             }
           },
         },
+        {
+          name: "View All Tickets",
+          action: () => {
+            const id = params.node?.data.id;
+            if (id) {
+              return navigate({
+                to: "/projects/$project/users/$user/tasks",
+                params: { user: id.toString(), project },
+              });
+            }
+          },
+        },
       ] satisfies (MenuItemDef | string)[];
     },
-    [navigate],
+    [navigate, project],
   );
 
   return (
