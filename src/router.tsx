@@ -133,6 +133,26 @@ const singleProjectTaskReportHomeRoute = createRoute({
   errorComponent: () => "Oh crap task report!",
 });
 
+const singleProjectTrucksRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "trucks",
+  component: lazyRouteComponent(
+    () => import("./trucks/TrucksTable"),
+    "TrucksTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectAddNewTruckRoute = createRoute({
+  getParentRoute: () => singleProjectTrucksRoute,
+  path: "new-truck",
+  component: lazyRouteComponent(
+    () => import("./trucks/TrucksTable"),
+    "TrucksTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
 const singleProjectTicketingNamesRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
   path: "ticketing-names",
@@ -202,6 +222,7 @@ const routeTree = rootRoute.addChildren([
     projectCreateRoute,
     singleProjectRoute.addChildren([
       projectEditRoute,
+      singleProjectTrucksRoute.addChildren([singleProjectAddNewTruckRoute]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,
         singleProjectUserTasksRoute,
