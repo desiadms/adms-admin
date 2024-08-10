@@ -36,7 +36,7 @@ export function TrucksTable() {
             variant="outlined"
             size="sm"
             onClick={() => {
-              navigate({ to: "/createUser" });
+              navigate({ to: "/projects/$project/trucks/new-truck", params: { project } });
             }}
           >
             Add Truck

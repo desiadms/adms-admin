@@ -13,6 +13,17 @@ const queryTrucks = graphql(/* GraphQL */ `
   }
 `);
 
+export const mutationInsertTruck = graphql(/* GraphQL */ `
+mutation InsertTruck($object: trucks_insert_input!) {
+  insert_trucks_one(object: $object, on_conflict: {constraint: trucks_pkey}) {
+    id
+    project_id
+  }
+}
+`);
+
+
+
 export function useAllTrucksByProject(projectId: string) {
   const { data, loading, error } = useQuerySub(queryTrucks, {
     variables: { project_id: projectId },
