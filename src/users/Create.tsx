@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Divider, Typography } from "@mui/joy";
-import { useNavigate } from "@tanstack/react-router";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -40,6 +40,8 @@ export function CreateForm({
       activeProject: "unemployed",
     },
   });
+
+  const { project } = useParams({ from: "/projects/$project/users" });
 
   const [executeMutation] = useMutation(mutationUpsertUser);
   const navigate = useNavigate();
@@ -98,7 +100,7 @@ export function CreateForm({
           },
         });
       } else {
-        navigate({ to: "/users" });
+        navigate({ to: "/projects/$project/users", params: { project } });
       }
     } catch (e) {
       console.error(e);
