@@ -24,7 +24,11 @@ export const queryUsers = graphql(/* GraphQL */ `
 `);
 
 export const mutationUpsertUser = graphql(/* GraphQL */ `
-  mutation UpsertUser($user: usersMetadata_insert_input!) {
+  mutation UpsertUser(
+    $user: usersMetadata_insert_input!
+    $id: uuid!
+    $disabled: Boolean = false
+  ) {
     insert_usersMetadata_one(
       object: $user
       on_conflict: {
@@ -32,6 +36,9 @@ export const mutationUpsertUser = graphql(/* GraphQL */ `
         update_columns: [first_name, hire_date, last_name, status]
       }
     ) {
+      id
+    }
+    updateUser(pk_columns: { id: $id }, _set: { disabled: $disabled }) {
       id
     }
   }
@@ -51,6 +58,7 @@ export function useAllUsers() {
   const users = useMemo(() => {
     return data?.usersMetadata.map((user) => ({
       ...user,
+      disabled: user.usersMetadata_user.disabled,
       usersMetadata_user: {
         ...user.usersMetadata_user,
         metadata: user.usersMetadata_user.metadata as unknown as TUserMetadata,

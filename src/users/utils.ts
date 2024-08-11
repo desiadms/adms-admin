@@ -8,6 +8,7 @@ export const createUserValidation = z.object({
   first_name: z.string().min(3),
   last_name: z.string().min(3),
   hire_date: z.string().nullish(),
+  disabled: z.boolean().optional(),
 });
 
 export const editUserValidation = z.object({
@@ -17,6 +18,7 @@ export const editUserValidation = z.object({
   first_name: z.string().min(3),
   last_name: z.string().min(3),
   hire_date: z.string().nullish(),
+  disabled: z.boolean().optional(),
 });
 
 export type CrateUserForm = z.infer<typeof createUserValidation>;

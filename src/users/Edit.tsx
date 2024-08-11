@@ -12,7 +12,12 @@ import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { InputField, SelectField, SelectFieldOption } from "../components/Form";
+import {
+  InputField,
+  SelectField,
+  SelectFieldOption,
+  SwitchField,
+} from "../components/Form";
 import { inputSx, maxFormWidth } from "../globals";
 import { useProjectOptions } from "../projects/hooks";
 import {
@@ -40,6 +45,7 @@ export function Edit() {
       hire_date: data?.hire_date || "",
       activeProject:
         data?.usersMetadata_user?.metadata?.activeProject || "unemployed",
+      disabled: data?.disabled || false,
     };
   }, [data]);
 
@@ -71,7 +77,8 @@ function EditForm({
   const [executeMedatataMutation] = useMutation(mutationUpdateUserMetadata);
 
   async function onSubmit(data: EditUserForm) {
-    const { first_name, hire_date, last_name, id, activeProject } = data;
+    const { first_name, hire_date, last_name, id, activeProject, disabled } =
+      data;
 
     try {
       const parsedActiveProject =
@@ -79,6 +86,8 @@ function EditForm({
 
       const userMutation = executeMutation({
         variables: {
+          id,
+          disabled,
           user: {
             id,
             first_name,
@@ -129,6 +138,7 @@ function EditForm({
             sx={{
               display: "flex",
               flexWrap: "wrap",
+              alignItems: "center",
               gap: 4,
             }}
           >
@@ -139,6 +149,7 @@ function EditForm({
               {...register("userId")}
               error={errors.userId}
             />
+
             <InputField
               sx={inputSx}
               label="first name"
@@ -168,6 +179,12 @@ function EditForm({
               defaultValue={user.activeProject ?? "unemployed"}
               options={projectOptions || []}
               error={errors.activeProject}
+            />
+            <SwitchField
+              name="disabled"
+              control={control}
+              label="disabled"
+              error={errors.disabled}
             />
 
             <FormControl sx={inputSx}>

@@ -6,7 +6,12 @@ import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { TCreateUserBody } from "../../api/createUser.mts";
-import { InputField, SelectField, SelectFieldOption } from "../components/Form";
+import {
+  InputField,
+  SelectField,
+  SelectFieldOption,
+  SwitchField,
+} from "../components/Form";
 import { TServerResponse, inputSx, maxFormWidth } from "../globals";
 import { useProjectOptions } from "../projects/hooks";
 import { convertToEmail } from "../utils";
@@ -54,6 +59,7 @@ export function CreateForm({
       password,
       userId,
       activeProject,
+      disabled,
     } = data;
 
     const email = convertToEmail(userId);
@@ -76,6 +82,8 @@ export function CreateForm({
 
           return executeMutation({
             variables: {
+              id,
+              disabled,
               user: {
                 id,
                 first_name,
@@ -135,6 +143,7 @@ export function CreateForm({
               {...register("userId")}
               error={errors.userId}
             />
+
             <InputField
               sx={inputSx}
               label="first name"
@@ -170,6 +179,12 @@ export function CreateForm({
               defaultValue="unemployed"
               options={projectOptions || []}
               error={errors.activeProject}
+            />
+            <SwitchField
+              name="disabled"
+              control={control}
+              label="disabled"
+              error={errors.disabled}
             />
           </Box>
 
