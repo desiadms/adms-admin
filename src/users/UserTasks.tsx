@@ -1,23 +1,9 @@
 import { Box, Divider, Typography } from "@mui/joy";
 import { useParams } from "@tanstack/react-router";
-import dayjs from "dayjs";
-import timezone from "dayjs/plugin/timezone";
-import utc from "dayjs/plugin/utc";
 import { useAllTasksByProjectAndUser } from "../reports/hooks";
+import { formatToEST } from "../utils";
 
-dayjs.extend(timezone);
-dayjs.extend(utc);
 
-function formatToEST(dateString) {
-  // Parse the date string as UTC
-  const date = dayjs(dateString).utc();
-
-  // Convert the date to EST timezone
-  const estDate = date.tz("America/New_York");
-
-  // Format the date in EST timezone
-  return estDate.format("YYYY-MM-DD HH:mm:ss");
-}
 
 type TPrintable = {
   created_at: string;

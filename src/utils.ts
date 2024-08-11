@@ -1,5 +1,23 @@
 import { useQuery } from "@apollo/client";
 import { TypedDocumentNode } from "@graphql-typed-document-node/core";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(timezone);
+dayjs.extend(utc);
+
+export function formatToEST(dateString) {
+  // Parse the date string as UTC
+  const date = dayjs(dateString).utc();
+
+  // Convert the date to EST timezone
+  const estDate = date.tz("America/New_York");
+
+  // Format the date in EST timezone
+  return estDate.format("YYYY-MM-DD HH:mm:ss");
+}
+
 
 export function keep<T, U>(
   coll: T[],

@@ -3,11 +3,14 @@ import { useParams } from "@tanstack/react-router";
 import { ColDef } from "ag-grid-community";
 import { useMemo } from "react";
 import { Table } from "../components/Table";
+import { nhost } from "../nhost";
+import { formatToEST } from "../utils";
 import { useAllTasksByProject } from "./hooks";
 
 export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const { data } = useAllTasksByProject(project);
+  console.log('data', data)
 
   const rowData = useMemo(() => data.map((task) => task.tasks).flat(), [data]);
 
@@ -15,6 +18,11 @@ export function TaskReportTable() {
     () =>
       [
         { field: "id", headerName: "ID", hide: true },
+        { field: "taskName", headerName: "Task Name" },
+        { field: "taskId", headerName: "Task ID" },
+      {field: 'createdAt', headerName: 'Created At (EST Time)', valueFormatter: (params) => {
+        return  formatToEST(params.value);
+      }},
         {
           field: "latitude",
           headerName: "Latitude",
@@ -22,9 +30,11 @@ export function TaskReportTable() {
         { field: "longitude", headerName: "Longitude" },
 
         { field: "projectId", headerName: "Project ID" },
-
-        { field: "taskId", headerName: "Task ID" },
-        { field: "taskName", headerName: "Task Name" },
+        {field: "imageId", headerName: "Image", valueGetter: (params) => {
+          return params.data?.imageId ? 
+          nhost.storage.getPublicUrl({fileId: params.data?.imageId}) :
+          'No Image';
+        }},
       ] satisfies ColDef<NonNullable<typeof rowData>[number]>[],
     [],
   );

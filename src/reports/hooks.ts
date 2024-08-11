@@ -159,7 +159,9 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 (stumpRemovalImage) => {
                   return {
                     taskId: task.id,
+                    createdAt: task.created_at,
                     taskName: "Stump Removal",
+                    imageId: stumpRemovalImage.id,
                     id: stumpRemovalImage.id,
                     projectId: task.project_id,
                     latitude: stumpRemovalImage.latitude,
@@ -181,7 +183,9 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return task.tasks_tree_removal_images.map((treeRemovalImage) => {
                 return {
                   taskId: task.id,
+                  createdAt: task.created_at,
                   taskName: "Tree Removal",
+                  imageId: treeRemovalImage.id,
                   id: treeRemovalImage.id,
                   projectId: task.project_id,
                   latitude: treeRemovalImage.latitude,
@@ -202,6 +206,8 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return task.images.map((taskTicketingImages) => {
                 return {
                   taskId: task.id,
+                  createdAt: task.created_at,
+                  imageId: taskTicketingImages.id,
                   taskName: task.task_ticketing_name?.name,
                   id: taskTicketingImages.id,
                   projectId: task.project_id,
@@ -227,6 +233,8 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return {
                 taskId: task.id,
                 taskName: label,
+                createdAt: task.created_at,
+                imageId: undefined,
                 id: task.id,
                 projectId: task.project_id,
                 latitude: task.latitude,
