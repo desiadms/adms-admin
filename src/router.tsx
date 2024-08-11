@@ -1,4 +1,3 @@
-import { Box } from "@mui/joy";
 import {
   Navigate,
   Outlet,
@@ -8,7 +7,6 @@ import {
   lazyRouteComponent,
 } from "@tanstack/react-router";
 import { AuthWrapper } from "./components/AuthWrapper";
-import { TopNav } from "./nav/Components";
 
 const rootRoute = createRootRoute({
   component: () => <AuthWrapper />,
@@ -38,39 +36,6 @@ const projectsHomeRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
-const usersRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "users",
-  component: () => (
-    <Box>
-      <TopNav />
-      <Outlet />
-    </Box>
-  ),
-  errorComponent: () => "Oh crap!",
-});
-
-const usersRouteHome = createRoute({
-  getParentRoute: () => usersRoute,
-  path: "/",
-  component: lazyRouteComponent(() => import("./users/AllUsers"), "Users"),
-  errorComponent: () => "Oh crap!",
-});
-
-const editUserRoute = createRoute({
-  getParentRoute: () => usersRoute,
-  path: "$user",
-  component: lazyRouteComponent(() => import("./users/Edit"), "Edit"),
-  errorComponent: () => "Oh crap!",
-});
-
-const createUsersFromAllUsersRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: "createUser",
-  component: lazyRouteComponent(() => import("./users/Create"), "Create"),
-  errorComponent: () => "Oh crap!",
-});
-
 const projectCreateRoute = createRoute({
   getParentRoute: () => projectsRoute,
   path: "create",
@@ -82,6 +47,20 @@ const singleProjectRoute = createRoute({
   getParentRoute: () => projectsRoute,
   path: "$project",
   component: lazyRouteComponent(() => import("./projects/Project"), "Project"),
+  errorComponent: () => "Oh crap!",
+});
+
+const createUserRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "createUser",
+  component: lazyRouteComponent(() => import("./users/Create"), "Create"),
+  errorComponent: () => "Oh crap!",
+});
+
+const editUserRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "editUser/$user",
+  component: lazyRouteComponent(() => import("./users/Edit"), "Edit"),
   errorComponent: () => "Oh crap!",
 });
 
@@ -150,14 +129,10 @@ const singleProjectTrucksRoute = createRoute({
   errorComponent: () => "Oh crap task report!",
 });
 
-
 const singleProjectAddNewTruckRoute = createRoute({
   getParentRoute: () => singleProjectTrucksHomeRoute,
   path: "new-truck",
-  component: lazyRouteComponent(
-    () => import("./trucks/Create"),
-    "Create",
-  ),
+  component: lazyRouteComponent(() => import("./trucks/Create"), "Create"),
   errorComponent: () => "Oh crap task report!",
 });
 
@@ -223,14 +198,17 @@ declare module "@tanstack/react-router" {
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
-  createUsersFromAllUsersRoute,
-  usersRoute.addChildren([usersRouteHome, editUserRoute]),
   projectsRoute.addChildren([
     projectsHomeRoute,
     projectCreateRoute,
     singleProjectRoute.addChildren([
       projectEditRoute,
-      singleProjectTrucksHomeRoute.addChildren([singleProjectTrucksRoute, singleProjectAddNewTruckRoute]),
+      createUserRoute,
+      editUserRoute,
+      singleProjectTrucksHomeRoute.addChildren([
+        singleProjectTrucksRoute,
+        singleProjectAddNewTruckRoute,
+      ]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,
         singleProjectUserTasksRoute,

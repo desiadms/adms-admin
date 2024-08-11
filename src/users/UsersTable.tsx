@@ -1,13 +1,10 @@
 import { Box, Button } from "@mui/joy";
+import { useNavigate, useParams } from "@tanstack/react-router";
 import {
   ColDef,
   GetContextMenuItemsParams,
   MenuItemDef,
 } from "ag-grid-community";
-import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
-import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
-// AG Grid Component
-import { useNavigate, useParams } from "@tanstack/react-router";
 import { useCallback, useMemo } from "react";
 import { Table } from "../components/Table";
 import { useProjectOptions } from "../projects/hooks";
@@ -60,8 +57,8 @@ export function UsersTable({
             const id = params.node?.data.id;
             if (id) {
               return navigate({
-                to: `/users/$user`,
-                params: { user: id.toString() },
+                to: "/projects/$project/editUser/$user",
+                params: { user: id.toString(), project },
               });
             }
           },
@@ -94,7 +91,10 @@ export function UsersTable({
             variant="outlined"
             size="sm"
             onClick={() => {
-              navigate({ to: "/createUser" });
+              navigate({
+                to: "/projects/$project/createUser",
+                params: { project },
+              });
             }}
           >
             Create User

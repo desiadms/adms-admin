@@ -8,6 +8,7 @@ import {
   FormLabel,
   Typography,
 } from "@mui/joy";
+import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -22,7 +23,8 @@ import {
 import { EditUserForm, editUserValidation } from "./utils";
 
 export function Edit() {
-  const { data, error, loading } = useUser();
+  const { user } = useParams({ from: "/projects/$project/editUser/$user" });
+  const { data, error, loading } = useUser(user);
   const {
     data: projectOptions,
     loading: projectLoading,

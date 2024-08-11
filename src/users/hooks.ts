@@ -84,10 +84,7 @@ export function useProjectUsers() {
   return { loading, error, data: projectUsers };
 }
 
-export function useUser() {
-  const { user: userId } = useParams({
-    from: "/users/$user",
-  });
+export function useUser(userId: string) {
   const { data, loading, error } = useAllUsers();
 
   const projectUser = useMemo(() => {

@@ -41,7 +41,7 @@ export function CreateForm({
     },
   });
 
-  const { project } = useParams({ from: "/projects/$project/users" });
+  const { project } = useParams({ from: "/projects/$project/createUser" });
 
   const [executeMutation] = useMutation(mutationUpsertUser);
   const navigate = useNavigate();
