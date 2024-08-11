@@ -64,7 +64,7 @@ export function useSingleProjectLinks() {
     {
       id: "tasks",
       to: "/projects/$project/task-report",
-      label: "Tasks",
+      label: "Reports",
       params,
     },
     {

@@ -96,6 +96,26 @@ export function Create() {
               )}
               error={errors.cubic_yardage}
             />
+            <InputField
+              sx={inputSx}
+              label="driver name"
+              {...register("driver_name",
+                {
+                    required: "Driver name is required",
+                  }
+              )}
+              error={errors.driver_name}
+            />
+             <InputField
+              sx={inputSx}
+              label="contractor"
+              {...register("contractor",
+                {
+                    required: "Contractor is required",
+                  }
+              )}
+              error={errors.contractor}
+            />
            
           </Box>
           <Button sx={{ mt: 4 }} type="submit" color="success" variant="solid">

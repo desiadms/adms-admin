@@ -9,6 +9,8 @@ const queryTrucks = graphql(/* GraphQL */ `
       project_id
       truck_number
       vin_number
+      driver_name
+      contractor
     }
   }
 `);

@@ -19,7 +19,9 @@ export function TrucksTable() {
           headerName: "Cubic Yardage",
         },
         { field: "truck_number", headerName: "Truck Number" },
-        { field: "vin_number", headerName: "VIN Number" },
+        { field: "vin_number", headerName: "License" },
+        { field: "driver_name", headerName: "Driver Name" },
+        { field: "contractor", headerName: "Contractor" },
       ] satisfies ColDef<AllTrucksByProjectQuery["trucks"][number]>[],
     [],
   );
