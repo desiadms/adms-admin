@@ -83,7 +83,7 @@ export function EditForm({ project }: { project: ProjectForm }) {
           />
           <InputField
             sx={inputSx}
-            label="sub contractor"
+            label="applicant"
             {...register("sub_contractor")}
             error={errors.sub_contractor}
           />

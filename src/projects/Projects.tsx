@@ -28,7 +28,7 @@ export function Projects() {
           valueGetter: (params) =>
             params.data?.status ? "Active" : "Inactive",
         },
-        { field: "sub_contractor", headerName: "Sub Contractor" },
+        { field: "sub_contractor", headerName: "Applicant" },
         { field: "location", headerName: "Location" },
         { field: "comment", headerName: "Comment" },
         { field: "contractor", headerName: "Contractor" },
