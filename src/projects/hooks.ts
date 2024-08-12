@@ -73,6 +73,12 @@ export function useSingleProjectLinks() {
       label: "Trucks",
       params,
     },
+    {
+      id: "disposal-sites",
+      to: "/projects/$project/disposal-sites",
+      label: "Disposal Sites",
+      params,
+    },
   ];
 
   return links;

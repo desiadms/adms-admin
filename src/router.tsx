@@ -190,6 +190,33 @@ const ticketingTaskRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
+const singleProjectDisposalSitesHomeRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "disposal-sites",
+  component: Outlet,
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectDisposalSitesRoute = createRoute({
+  getParentRoute: () => singleProjectDisposalSitesHomeRoute,
+  path: "/",
+  component: lazyRouteComponent(
+    () => import("./disposal-sites/DisposalSitesTable"),
+    "DisposalSitesTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectAddNewDisposalSitesRoute = createRoute({
+  getParentRoute: () => singleProjectDisposalSitesHomeRoute,
+  path: "new-site",
+  component: lazyRouteComponent(
+    () => import("./disposal-sites/Create"),
+    "Create",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -208,6 +235,10 @@ const routeTree = rootRoute.addChildren([
       singleProjectTrucksHomeRoute.addChildren([
         singleProjectTrucksRoute,
         singleProjectAddNewTruckRoute,
+      ]),
+      singleProjectDisposalSitesHomeRoute.addChildren([
+        singleProjectDisposalSitesRoute,
+        singleProjectAddNewDisposalSitesRoute,
       ]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,

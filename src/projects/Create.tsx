@@ -97,7 +97,7 @@ export function Create() {
             />
             <InputField
               sx={inputSx}
-              label="sub contractor"
+              label="applicant"
               {...register("sub_contractor")}
               error={errors.sub_contractor}
             />
