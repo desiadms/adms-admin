@@ -85,7 +85,7 @@ function DebrisTypeForm({
           >
             <InputField
               sx={inputSx}
-              label="Disposal Site Name"
+              label="Debris Type Name"
               {...register("name")}
               error={errors.name}
             />

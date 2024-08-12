@@ -245,7 +245,7 @@ const singleProjectDebrisTypesRoute = createRoute({
   getParentRoute: () => singleProjectDebrisTypeHomeRoute,
   path: "/",
   component: lazyRouteComponent(
-    () => import("./debris-type/DebrisTypeTable"),
+    () => import("./debris-types/DebrisTypeTable"),
     "DebrisTypeTable",
   ),
   errorComponent: () => "Oh crap task report!",
@@ -255,7 +255,7 @@ const singleProjectAddNewDebrisTypeRoute = createRoute({
   getParentRoute: () => singleProjectDebrisTypeHomeRoute,
   path: "new-debris-type",
   component: lazyRouteComponent(
-    () => import("./debris-type/CreateEdit"),
+    () => import("./debris-types/CreateEdit"),
     "Create",
   ),
   errorComponent: () => "Oh crap task report!",
@@ -265,7 +265,44 @@ const singleProjectEditDebrisTypeRoute = createRoute({
   getParentRoute: () => singleProjectDebrisTypeHomeRoute,
   path: "edit-debris-type/$debrisTypeId",
   component: lazyRouteComponent(
-    () => import("./debris-type/CreateEdit"),
+    () => import("./debris-types/CreateEdit"),
+    "Edit",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectContractorsHomeRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "contractors",
+  component: Outlet,
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectContractorsRoute = createRoute({
+  getParentRoute: () => singleProjectContractorsHomeRoute,
+  path: "/",
+  component: lazyRouteComponent(
+    () => import("./contractors/ContractorsTable"),
+    "ContractorsTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectAddNewContractorsRoute = createRoute({
+  getParentRoute: () => singleProjectContractorsHomeRoute,
+  path: "new-contractor",
+  component: lazyRouteComponent(
+    () => import("./contractors/CreateEdit"),
+    "Create",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectEditContractorsRoute = createRoute({
+  getParentRoute: () => singleProjectContractorsHomeRoute,
+  path: "edit-contractor/$contractorId",
+  component: lazyRouteComponent(
+    () => import("./contractors/CreateEdit"),
     "Edit",
   ),
   errorComponent: () => "Oh crap task report!",
@@ -300,6 +337,11 @@ const routeTree = rootRoute.addChildren([
         singleProjectDebrisTypesRoute,
         singleProjectAddNewDebrisTypeRoute,
         singleProjectEditDebrisTypeRoute,
+      ]),
+      singleProjectContractorsHomeRoute.addChildren([
+        singleProjectContractorsRoute,
+        singleProjectAddNewContractorsRoute,
+        singleProjectEditContractorsRoute,
       ]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,

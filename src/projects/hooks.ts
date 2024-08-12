@@ -85,6 +85,12 @@ export function useSingleProjectLinks() {
       label: "Debris Types",
       params,
     },
+    {
+      id: "contractors",
+      to: "/projects/$project/contractors",
+      label: "Contractors",
+      params,
+    },
   ];
 
   return links;
