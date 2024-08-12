@@ -132,7 +132,14 @@ const singleProjectTrucksRoute = createRoute({
 const singleProjectAddNewTruckRoute = createRoute({
   getParentRoute: () => singleProjectTrucksHomeRoute,
   path: "new-truck",
-  component: lazyRouteComponent(() => import("./trucks/Create"), "Create"),
+  component: lazyRouteComponent(() => import("./trucks/CreateEdit"), "Create"),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectEditTruckRoute = createRoute({
+  getParentRoute: () => singleProjectTrucksHomeRoute,
+  path: "edit-truck/$truck",
+  component: lazyRouteComponent(() => import("./trucks/CreateEdit"), "Edit"),
   errorComponent: () => "Oh crap task report!",
 });
 
@@ -211,8 +218,18 @@ const singleProjectAddNewDisposalSitesRoute = createRoute({
   getParentRoute: () => singleProjectDisposalSitesHomeRoute,
   path: "new-site",
   component: lazyRouteComponent(
-    () => import("./disposal-sites/Create"),
+    () => import("./disposal-sites/CreateEdit"),
     "Create",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectEditDisposalSitesRoute = createRoute({
+  getParentRoute: () => singleProjectDisposalSitesHomeRoute,
+  path: "edit-site/$site",
+  component: lazyRouteComponent(
+    () => import("./disposal-sites/CreateEdit"),
+    "Edit",
   ),
   errorComponent: () => "Oh crap task report!",
 });
@@ -235,10 +252,12 @@ const routeTree = rootRoute.addChildren([
       singleProjectTrucksHomeRoute.addChildren([
         singleProjectTrucksRoute,
         singleProjectAddNewTruckRoute,
+        singleProjectEditTruckRoute,
       ]),
       singleProjectDisposalSitesHomeRoute.addChildren([
         singleProjectDisposalSitesRoute,
         singleProjectAddNewDisposalSitesRoute,
+        singleProjectEditDisposalSitesRoute,
       ]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,

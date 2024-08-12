@@ -29,3 +29,11 @@ export function useAllDisposalSitesByProject(projectId: string) {
 
   return { data, loading, error };
 }
+
+export function useDisposalSiteById(projectId: string, site: string) {
+  const { data, ...rest } = useAllDisposalSitesByProject(projectId);
+  return {
+    ...rest,
+    data: data?.disposal_sites.find((disposalSite) => disposalSite.id === site),
+  };
+}

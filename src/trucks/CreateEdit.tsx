@@ -4,34 +4,34 @@ import { Box, Button, Divider, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import {
-    InputField
-} from "../components/Form";
+import { InputField } from "../components/Form";
 import { inputSx, maxFormWidth } from "../globals";
-import { mutationInsertTruck } from "./hooks";
-import { TruckForm, truckValidation } from "./utils";
+import { mutationInsertTruck, useTruckById } from "./hooks";
+import { truckValidation, type TruckForm } from "./utils";
 
-export function Create() {
+function TruckForm({ truck, project }: { truck?: TruckForm; project: string }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<TruckForm>({
     resolver: zodResolver(truckValidation),
+    defaultValues: truck,
   });
 
   const [executeMutation] = useMutation(mutationInsertTruck);
-  const navigate = useNavigate({ from: "/projects/$project/trucks/new-truck" });
-  const {project} = useParams({ from: "/projects/$project/trucks/new-truck" });
+  const navigate = useNavigate();
 
   async function onSubmit(data: TruckForm) {
     try {
       const res = await toast.promise(
-        executeMutation({ variables: { object: {...data, project_id: project} } }),
+        executeMutation({
+          variables: { object: { ...data, project_id: project } },
+        }),
         {
-          loading: "Creating truck...",
-          success: "Truck created",
-          error: "Failed to create truck",
+          loading: truck ? "Updating truck..." : "Creating truck...",
+          success: truck ? "Truck updated" : "Truck created",
+          error: truck ? "Failed to update truck" : "Failed to create truck",
         },
       );
 
@@ -46,7 +46,7 @@ export function Create() {
     } catch (e) {
       console.error(e);
     }
-  } 
+  }
 
   return (
     <Box>
@@ -89,40 +89,54 @@ export function Create() {
             <InputField
               sx={inputSx}
               label="cubic yardage"
-              {...register("cubic_yardage",
-                {
-                    required: "Cubic yardage is required",
-                  }
-              )}
+              {...register("cubic_yardage", {
+                required: "Cubic yardage is required",
+              })}
               error={errors.cubic_yardage}
             />
             <InputField
               sx={inputSx}
               label="driver name"
-              {...register("driver_name",
-                {
-                    required: "Driver name is required",
-                  }
-              )}
+              {...register("driver_name", {
+                required: "Driver name is required",
+              })}
               error={errors.driver_name}
             />
-             <InputField
+            <InputField
               sx={inputSx}
               label="contractor"
-              {...register("contractor",
-                {
-                    required: "Contractor is required",
-                  }
-              )}
+              {...register("contractor", {
+                required: "Contractor is required",
+              })}
               error={errors.contractor}
             />
-           
           </Box>
           <Button sx={{ mt: 4 }} type="submit" color="success" variant="solid">
-            Add Truck
+            {truck ? "Update" : "Create"} Truck
           </Button>
         </form>
       </Box>
     </Box>
   );
+}
+
+export function Create() {
+  const { project } = useParams({
+    from: "/projects/$project/trucks/new-truck",
+  });
+
+  return <TruckForm project={project} />;
+}
+
+export function Edit() {
+  const { project, truck } = useParams({
+    from: "/projects/$project/trucks/edit-truck/$truck",
+  });
+
+  const { data, loading, error } = useTruckById(project, truck);
+
+  if (loading) return <div>loading</div>;
+  if (error) return <div>error</div>;
+
+  return <TruckForm project={project} truck={data} />;
 }

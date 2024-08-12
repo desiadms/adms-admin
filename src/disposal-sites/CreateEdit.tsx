@@ -4,46 +4,47 @@ import { Box, Button, Divider, Typography } from "@mui/joy";
 import { useNavigate, useParams } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-import { z } from "zod";
-import { AllDisposalSitesByProjectQuery } from "../__generated__/gql/graphql";
 import { InputField } from "../components/Form";
 import { inputSx, maxFormWidth } from "../globals";
-import { mutationInsertTruck } from "./hooks";
+import { mutationInsertTruck, useDisposalSiteById } from "./hooks";
+import { disposalSiteValidation, type DisposalSiteForm } from "./utils";
 
-export type DisposalSiteForm =
-  AllDisposalSitesByProjectQuery["disposal_sites"][number];
-
-const disposalSiteValidation = z.object({
-  name: z.string().min(3),
-});
-
-export function Create() {
+function DisposalSiteForm({
+  disposalSite,
+  project,
+}: {
+  disposalSite?: DisposalSiteForm;
+  project: string;
+}) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<DisposalSiteForm>({
     resolver: zodResolver(disposalSiteValidation),
+    defaultValues: disposalSite,
   });
 
   const [executeMutation] = useMutation(mutationInsertTruck);
-  const navigate = useNavigate({
-    from: "/projects/$project/disposal-sites/new-site",
-  });
-  const { project } = useParams({
-    from: "/projects/$project/disposal-sites/new-site",
-  });
+  const navigate = useNavigate();
 
   async function onSubmit(data: DisposalSiteForm) {
     try {
+      console.log("data", data);
       const res = await toast.promise(
         executeMutation({
           variables: { object: { ...data, project_id: project } },
         }),
         {
-          loading: "Creating truck...",
-          success: "Truck created",
-          error: "Failed to create truck",
+          loading: disposalSite
+            ? "Updating disposal site..."
+            : "Creating disposal site...",
+          success: disposalSite
+            ? "Disposal site updated"
+            : "Disposal site created",
+          error: disposalSite
+            ? "Failed to update disposal site"
+            : "Failed to create disposal site",
         },
       );
 
@@ -90,10 +91,30 @@ export function Create() {
             />
           </Box>
           <Button sx={{ mt: 4 }} type="submit" color="success" variant="solid">
-            Add Disposal Site
+            {disposalSite ? "Update" : "Create"} Disposal Site
           </Button>
         </form>
       </Box>
     </Box>
   );
+}
+
+export function Create() {
+  const { project } = useParams({
+    from: "/projects/$project/disposal-sites/new-site",
+  });
+
+  return <DisposalSiteForm project={project} />;
+}
+
+export function Edit() {
+  const { project, site } = useParams({
+    from: "/projects/$project/disposal-sites/edit-site/$site",
+  });
+  const { data, loading, error } = useDisposalSiteById(project, site);
+
+  if (loading) return <div>loading</div>;
+  if (error) return <div>error</div>;
+
+  return <DisposalSiteForm disposalSite={data} project={project} />;
 }
