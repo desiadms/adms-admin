@@ -6,7 +6,7 @@ import { useAllTasksByProject } from "./hooks";
 export function TaskReportMap() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const { data, loading, error } = useAllTasksByProject(project);
-  console.log("data", project, data, loading, error);
+
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
   if (!data) return <div>no data</div>;

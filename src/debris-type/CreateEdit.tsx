@@ -6,53 +6,51 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { InputField } from "../components/Form";
 import { inputSx, maxFormWidth } from "../globals";
-import { mutationInsertTruck, useDisposalSiteById } from "./hooks";
-import { disposalSiteValidation, type DisposalSiteForm } from "./utils";
+import { mutationInsertDebrisType, useDebrisTypeById } from "./hooks";
+import { debrisTypeValidation, type DebrisTypeForm } from "./utils";
 
-function DisposalSiteForm({
-  disposalSite,
+function DebrisTypeForm({
+  debrisType,
   project,
 }: {
-  disposalSite?: DisposalSiteForm;
+  debrisType?: DebrisTypeForm;
   project: string;
 }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<DisposalSiteForm>({
-    resolver: zodResolver(disposalSiteValidation),
-    defaultValues: disposalSite,
+  } = useForm<DebrisTypeForm>({
+    resolver: zodResolver(debrisTypeValidation),
+    defaultValues: debrisType,
   });
 
-  const [executeMutation] = useMutation(mutationInsertTruck);
+  const [executeMutation] = useMutation(mutationInsertDebrisType);
   const navigate = useNavigate();
 
-  async function onSubmit(data: DisposalSiteForm) {
+  async function onSubmit(data: DebrisTypeForm) {
     try {
       const res = await toast.promise(
         executeMutation({
           variables: { object: { ...data, project_id: project } },
         }),
         {
-          loading: disposalSite
-            ? "Updating disposal site..."
-            : "Creating disposal site...",
-          success: disposalSite
-            ? "Disposal site updated"
-            : "Disposal site created",
-          error: disposalSite
-            ? "Failed to update disposal site"
-            : "Failed to create disposal site",
+          loading: debrisType
+            ? "Updating debris site..."
+            : "Creating debris site...",
+          success: debrisType ? "Debris site updated" : "Debris site created",
+          error: debrisType
+            ? "Failed to update debris site"
+            : "Failed to create debris site",
         },
       );
 
-      const projectId = res?.data?.insert_disposal_sites_one?.project_id;
+      const projectId = res?.data?.insert_debris_types_one?.project_id;
 
       if (!projectId) throw new Error("Cannot find project id in response");
 
       navigate({
-        to: "/projects/$project/disposal-sites",
+        to: "/projects/$project/debris-types",
         params: { project: projectId },
       });
     } catch (e) {
@@ -73,7 +71,8 @@ function DisposalSiteForm({
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <Typography level="h3">
-            {disposalSite ? "Edit" : "Add"} Disposal Site
+            {" "}
+            {debrisType ? "Edit" : "Add"} Debris Type
           </Typography>
           <Divider sx={{ my: 2 }} />
 
@@ -92,7 +91,7 @@ function DisposalSiteForm({
             />
           </Box>
           <Button sx={{ mt: 4 }} type="submit" color="success" variant="solid">
-            {disposalSite ? "Update" : "Create"} Disposal Site
+            {debrisType ? "Update" : "Create"} Debris Site
           </Button>
         </form>
       </Box>
@@ -102,20 +101,20 @@ function DisposalSiteForm({
 
 export function Create() {
   const { project } = useParams({
-    from: "/projects/$project/disposal-sites/new-site",
+    from: "/projects/$project/debris-types/new-debris-type",
   });
 
-  return <DisposalSiteForm project={project} />;
+  return <DebrisTypeForm project={project} />;
 }
 
 export function Edit() {
-  const { project, site } = useParams({
-    from: "/projects/$project/disposal-sites/edit-site/$site",
+  const { project, debrisTypeId } = useParams({
+    from: "/projects/$project/debris-types/edit-debris-type/$debrisTypeId",
   });
-  const { data, loading, error } = useDisposalSiteById(project, site);
+  const { data, loading, error } = useDebrisTypeById(project, debrisTypeId);
 
   if (loading) return <div>loading</div>;
   if (error) return <div>error</div>;
 
-  return <DisposalSiteForm disposalSite={data} project={project} />;
+  return <DebrisTypeForm debrisType={data} project={project} />;
 }

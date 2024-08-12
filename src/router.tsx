@@ -234,6 +234,43 @@ const singleProjectEditDisposalSitesRoute = createRoute({
   errorComponent: () => "Oh crap task report!",
 });
 
+const singleProjectDebrisTypeHomeRoute = createRoute({
+  getParentRoute: () => singleProjectRoute,
+  path: "debris-types",
+  component: Outlet,
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectDebrisTypesRoute = createRoute({
+  getParentRoute: () => singleProjectDebrisTypeHomeRoute,
+  path: "/",
+  component: lazyRouteComponent(
+    () => import("./debris-type/DebrisTypeTable"),
+    "DebrisTypeTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectAddNewDebrisTypeRoute = createRoute({
+  getParentRoute: () => singleProjectDebrisTypeHomeRoute,
+  path: "new-debris-type",
+  component: lazyRouteComponent(
+    () => import("./debris-type/CreateEdit"),
+    "Create",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
+const singleProjectEditDebrisTypeRoute = createRoute({
+  getParentRoute: () => singleProjectDebrisTypeHomeRoute,
+  path: "edit-debris-type/$debrisTypeId",
+  component: lazyRouteComponent(
+    () => import("./debris-type/CreateEdit"),
+    "Edit",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -258,6 +295,11 @@ const routeTree = rootRoute.addChildren([
         singleProjectDisposalSitesRoute,
         singleProjectAddNewDisposalSitesRoute,
         singleProjectEditDisposalSitesRoute,
+      ]),
+      singleProjectDebrisTypeHomeRoute.addChildren([
+        singleProjectDebrisTypesRoute,
+        singleProjectAddNewDebrisTypeRoute,
+        singleProjectEditDebrisTypeRoute,
       ]),
       singleProjectUsersHomeRoute.addChildren([
         singleProjectUsersRoute,

@@ -60,7 +60,7 @@ function TruckForm({ truck, project }: { truck?: TruckForm; project: string }) {
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Typography level="h3">Add Truck</Typography>
+          <Typography level="h3">{truck ? "Edit" : "Add"} Truck</Typography>
           <Divider sx={{ my: 2 }} />
 
           <Box
