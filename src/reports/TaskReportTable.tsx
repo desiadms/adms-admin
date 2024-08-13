@@ -1,16 +1,58 @@
 import { Box } from "@mui/joy";
 import { useParams } from "@tanstack/react-router";
-import { ColDef } from "ag-grid-community";
-import { useMemo } from "react";
+import {
+  ColDef,
+  ExcelImage,
+  GetContextMenuItemsParams,
+  MenuItemDef,
+} from "ag-grid-community";
+import { useCallback, useMemo } from "react";
+import toast from "react-hot-toast";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { formatToEST } from "../utils";
 import { useAllTasksByProject } from "./hooks";
 
+function getBase64Image(url: string) {
+  return fetch(url)
+    .then((response) => response.blob())
+    .then(
+      (blob) =>
+        new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        }),
+    );
+}
+
+async function generateBase64ImagesMap(
+  data: ReturnType<typeof useAllTasksByProject>["data"],
+) {
+  const base64ImagesMap = new Map<string, string>();
+
+  // Flatten all tasks into a single array of promises
+  const promises =
+    data?.flatMap((task) =>
+      task.tasks.map(async (task) => {
+        const url = await nhost.storage.getPresignedUrl({
+          fileId: task.imageId,
+        });
+        const base64 = await getBase64Image(url.presignedUrl?.url || "");
+        base64ImagesMap.set(task.imageId, base64);
+      }),
+    ) || [];
+
+  // Wait for all promises to resolve
+  await Promise.all(promises);
+
+  return base64ImagesMap;
+}
+
 export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const { data } = useAllTasksByProject(project);
-  console.log('data', data)
 
   const rowData = useMemo(() => data.map((task) => task.tasks).flat(), [data]);
 
@@ -20,9 +62,13 @@ export function TaskReportTable() {
         { field: "id", headerName: "ID", hide: true },
         { field: "taskName", headerName: "Task Name" },
         { field: "taskId", headerName: "Task ID" },
-      {field: 'createdAt', headerName: 'Created At (EST Time)', valueFormatter: (params) => {
-        return  formatToEST(params.value);
-      }},
+        {
+          field: "createdAt",
+          headerName: "Created At (EST Time)",
+          valueFormatter: (params) => {
+            return formatToEST(params.value);
+          },
+        },
         {
           field: "latitude",
           headerName: "Latitude",
@@ -30,18 +76,72 @@ export function TaskReportTable() {
         { field: "longitude", headerName: "Longitude" },
 
         { field: "projectId", headerName: "Project ID" },
-        {field: "imageId", headerName: "Image", valueGetter: (params) => {
-          return params.data?.imageId ? 
-          nhost.storage.getPublicUrl({fileId: params.data?.imageId}) :
-          'No Image';
-        }},
+        {
+          field: "imageId",
+          headerName: "Image",
+          cellRenderer: (params) => {
+            if (!params.data?.imageId) return "No Image";
+            const url = nhost.storage.getPublicUrl({
+              fileId: params.data?.imageId,
+            });
+
+            return (
+              <img src={url} alt="task" style={{ width: 100, height: 100 }} />
+            );
+          },
+        },
       ] satisfies ColDef<NonNullable<typeof rowData>[number]>[],
     [],
   );
 
+  const getContextMenuItems = useCallback(
+    (params: GetContextMenuItemsParams) => {
+      return [
+        "copy",
+        {
+          name: "Export to Excel",
+          action: async () => {
+            const asyncBase64ImagesMap = generateBase64ImagesMap(data);
+
+            toast.promise(asyncBase64ImagesMap, {
+              loading: "Generating images...",
+              success: "Images generated, exporting to Excel...",
+              error: "Failed to generate images",
+            });
+
+            const base64ImagesMap = await asyncBase64ImagesMap;
+            params.api.exportDataAsExcel({
+              rowHeight: 200,
+              addImageToCell: (rowIndex, column, value) => {
+                if (column.getColId() === "imageId" && value.length) {
+                  const image: ExcelImage = {
+                    id: rowIndex.toString(),
+                    base64: base64ImagesMap.get(value) || "",
+                    imageType: "png",
+                    height: 200,
+                    width: 200,
+                  };
+
+                  return {
+                    image,
+                  };
+                }
+              },
+            });
+          },
+        },
+      ] satisfies (MenuItemDef | string)[];
+    },
+    [data],
+  );
+
   return (
     <Box>
-      <Table rowData={rowData} columnDefs={columnDefs} />
+      <Table
+        rowData={rowData}
+        columnDefs={columnDefs}
+        getContextMenuItems={getContextMenuItems}
+      />
     </Box>
   );
 }
