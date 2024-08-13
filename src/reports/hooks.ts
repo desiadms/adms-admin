@@ -93,6 +93,9 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      tasks_collection_user {
+        email
+      }
     }
     tasks_disposal(where: { project_id: { _eq: $project_id } }) {
       id
@@ -100,12 +103,18 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      tasks_disposal_user {
+        email
+      }
     }
     tasks_stump_removal(where: { project_id: { _eq: $project_id } }) {
       id
       project_id
       created_at
       user_id
+      tasks_branch_removal_user {
+        email
+      }
       tasks_stump_removal_images {
         id
         latitude
@@ -121,6 +130,9 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       project_id
       created_at
       user_id
+      tasks_ticketing_user {
+        email
+      }
       task_ticketing_name {
         name
       }
@@ -136,6 +148,9 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       project_id
       created_at
       user_id
+      tasks_tree_removal_user {
+        email
+      }
       tasks_tree_removal_images {
         id
         latitude
@@ -163,6 +178,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                     taskName: "Stump Removal",
                     imageId: stumpRemovalImage.id,
                     id: stumpRemovalImage.id,
+                    userPin: task.tasks_branch_removal_user?.email,
                     projectId: task.project_id,
                     latitude: stumpRemovalImage.latitude,
                     longitude: stumpRemovalImage.longitude,
@@ -186,6 +202,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                   createdAt: task.created_at,
                   taskName: "Tree Removal",
                   imageId: treeRemovalImage.id,
+                  userPin: task.tasks_tree_removal_user?.email,
                   id: treeRemovalImage.id,
                   projectId: task.project_id,
                   latitude: treeRemovalImage.latitude,
@@ -208,6 +225,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                   taskId: task.id,
                   createdAt: task.created_at,
                   imageId: taskTicketingImages.id,
+                  userPin: task.tasks_ticketing_user?.email,
                   taskName: task.task_ticketing_name?.name,
                   id: taskTicketingImages.id,
                   projectId: task.project_id,
@@ -234,6 +252,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 taskId: task.id,
                 taskName: label,
                 createdAt: task.created_at,
+                userPin: task.tasks_collection_user?.email,
                 imageId: undefined,
                 id: task.id,
                 projectId: task.project_id,
@@ -303,6 +322,9 @@ export const queryTreeRemoval = graphql(/* GraphQL */ `
       comment
       completed
       created_at
+      tasks_tree_removal_user {
+        email
+      }
       tasks_tree_removal_images {
         id
         latitude
@@ -332,6 +354,9 @@ export const queryTicketingTask = graphql(/* GraphQL */ `
       task_ticketing_name {
         name
         comment
+      }
+      tasks_ticketing_user {
+        email
       }
     }
   }

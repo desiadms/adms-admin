@@ -10,6 +10,7 @@ import { useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
+import { useProject } from "../projects/hooks";
 import { formatToEST } from "../utils";
 import { useAllTasksByProject } from "./hooks";
 
@@ -52,6 +53,7 @@ async function generateBase64ImagesMap(
 
 export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
+  const projectData = useProject();
   const { data } = useAllTasksByProject(project);
 
   const rowData = useMemo(() => data.map((task) => task.tasks).flat(), [data]);
@@ -60,6 +62,13 @@ export function TaskReportTable() {
     () =>
       [
         { field: "id", headerName: "ID", hide: true },
+        {
+          field: "userPin",
+          headerName: "User Pin",
+          valueGetter: (params) => {
+            return params.data?.userPin.split("@")[0];
+          },
+        },
         { field: "taskName", headerName: "Task Name" },
         { field: "taskId", headerName: "Task ID" },
         {
@@ -75,7 +84,7 @@ export function TaskReportTable() {
         },
         { field: "longitude", headerName: "Longitude" },
 
-        { field: "projectId", headerName: "Project ID" },
+        { headerName: "Project", valueGetter: () => projectData.data?.name },
         {
           field: "imageId",
           headerName: "Image",
@@ -91,7 +100,7 @@ export function TaskReportTable() {
           },
         },
       ] satisfies ColDef<NonNullable<typeof rowData>[number]>[],
-    [],
+    [projectData],
   );
 
   const getContextMenuItems = useCallback(
