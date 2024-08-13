@@ -93,6 +93,15 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      debris_type_data {
+        name
+      }
+      contractor_data {
+        name
+      }
+      truck_data {
+        truck_number
+      }
       tasks_collection_user {
         email
       }
@@ -103,6 +112,18 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      debris_type_data {
+        name
+      }
+      contractor_data {
+        name
+      }
+      truck_data {
+        truck_number
+      }
+      disposal_site_data {
+        name
+      }
       tasks_disposal_user {
         email
       }
@@ -241,19 +262,42 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
             key,
             tasks: allImageCoordinates,
           };
-        } else if (key === "tasks_collection" || key === "tasks_disposal") {
-          const label = key === "tasks_collection" ? "Collection" : "Disposal";
-
+        } else if (key === "tasks_collection") {
           return {
-            label: label,
+            label: "Collection",
             key,
             tasks: tasks.map((task) => {
               return {
                 taskId: task.id,
-                taskName: label,
+                taskName: "Collection",
                 createdAt: task.created_at,
                 userPin: task.tasks_collection_user?.email,
                 imageId: undefined,
+                truckNumber: task.truck_data.truck_number,
+                debrisSite: task.debris_type_data.name,
+                contractorName: task.contractor_data.name,
+                id: task.id,
+                projectId: task.project_id,
+                latitude: task.latitude,
+                longitude: task.longitude,
+              };
+            }),
+          };
+        } else if (key === "tasks_disposal") {
+          return {
+            label: "Disposal",
+            key,
+            tasks: tasks.map((task) => {
+              return {
+                taskId: task.id,
+                taskName: "Disposal",
+                createdAt: task.created_at,
+                userPin: task.tasks_disposal_user?.email,
+                imageId: undefined,
+                truckNumber: task.truck_data?.truck_number,
+                debrisSite: task.debris_type_data.name,
+                contractorName: task.contractor_data?.name,
+                disposalSite: task.disposal_site_data?.name,
                 id: task.id,
                 projectId: task.project_id,
                 latitude: task.latitude,

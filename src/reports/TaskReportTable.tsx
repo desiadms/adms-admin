@@ -62,15 +62,16 @@ export function TaskReportTable() {
     () =>
       [
         { field: "id", headerName: "ID", hide: true },
+        { headerName: "Project", valueGetter: () => projectData.data?.name },
+
         {
           field: "userPin",
           headerName: "User Pin",
           valueGetter: (params) => {
-            return params.data?.userPin.split("@")[0];
+            return params.data?.userPin?.split("@")[0];
           },
         },
         { field: "taskName", headerName: "Task Name" },
-        { field: "taskId", headerName: "Task ID" },
         {
           field: "createdAt",
           headerName: "Created At (EST Time)",
@@ -78,13 +79,46 @@ export function TaskReportTable() {
             return formatToEST(params.value);
           },
         },
+
         {
           field: "latitude",
           headerName: "Latitude",
         },
         { field: "longitude", headerName: "Longitude" },
+        { field: "taskId", headerName: "Task ID" },
+        {
+          headerName: "Truck Number",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "truckNumber" in params.data ? params.data.truckNumber : "-";
+          },
+        },
+        {
+          headerName: "Debris Site",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "debrisSite" in params.data ? params.data.debrisSite : "-";
+          },
+        },
+        {
+          headerName: "Contractor Name",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "contractorName" in params.data
+              ? params.data.contractorName
+              : "-";
+          },
+        },
+        {
+          headerName: "Disposal Site",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "disposalSite" in params.data
+              ? params.data.disposalSite
+              : "-";
+          },
+        },
 
-        { headerName: "Project", valueGetter: () => projectData.data?.name },
         {
           field: "imageId",
           headerName: "Image",
