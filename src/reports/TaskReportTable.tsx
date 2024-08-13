@@ -28,15 +28,16 @@ function getBase64Image(url: string) {
     );
 }
 
+const base64ImagesMap = new Map<string, string>();
+
 async function generateBase64ImagesMap(
   data: ReturnType<typeof useAllTasksByProject>["data"],
 ) {
-  const base64ImagesMap = new Map<string, string>();
-
   // Flatten all tasks into a single array of promises
   const promises =
     data?.flatMap((task) =>
       task.tasks.map(async (task) => {
+        if (base64ImagesMap.has(task.imageId)) return;
         const url = await nhost.storage.getPresignedUrl({
           fileId: task.imageId,
         });
