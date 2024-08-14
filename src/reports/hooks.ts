@@ -8,38 +8,91 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
   query AllTasksByProjectAndUser($project_id: uuid!, $user_id: uuid!) {
     tasks_collection(
       where: {
-        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+        _and: { project_id: { _eq: $project_id } }
+        user_id: { _eq: $user_id }
       }
     ) {
       id
-      comment
       latitude
       longitude
+      project {
+        name
+      }
       project_id
       created_at
+      tasks_collection_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
+      debris_type_data {
+        name
+      }
+      contractor_data {
+        name
+      }
+      truck_data {
+        truck_number
+      }
+      userPin: tasks_collection_user {
+        email
+      }
     }
     tasks_disposal(
       where: {
-        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+        _and: { project_id: { _eq: $project_id } }
+        user_id: { _eq: $user_id }
       }
     ) {
       id
-      comment
       latitude
       longitude
+      project {
+        name
+      }
       project_id
       created_at
+      tasks_disposal_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
+      debris_type_data {
+        name
+      }
+      contractor_data {
+        name
+      }
+      truck_data {
+        truck_number
+      }
+      disposal_site_data {
+        name
+      }
+      userPin: tasks_disposal_user {
+        email
+      }
     }
     tasks_stump_removal(
       where: {
-        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+        _and: { project_id: { _eq: $project_id } }
+        user_id: { _eq: $user_id }
       }
     ) {
       id
-      comment
       project_id
       created_at
       user_id
+      project {
+        name
+      }
+      userPin: tasks_branch_removal_user {
+        email
+      }
       tasks_stump_removal_images {
         id
         latitude
@@ -50,30 +103,48 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_ticketing(
       where: {
-        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+        _and: { project_id: { _eq: $project_id } }
+        user_id: { _eq: $user_id }
       }
     ) {
       id
       latitude
       longitude
-      comment
+      project {
+        name
+      }
       project_id
       created_at
       user_id
+      userPin: tasks_ticketing_user {
+        email
+      }
       task_ticketing_name {
         name
+      }
+      images {
+        id
+        latitude
+        longitude
+        created_at
       }
     }
     tasks_tree_removal(
       where: {
-        _and: { project_id: { _eq: $project_id }, user_id: { _eq: $user_id } }
+        _and: { project_id: { _eq: $project_id } }
+        user_id: { _eq: $user_id }
       }
     ) {
       id
       project_id
       created_at
-      comment
       user_id
+      project {
+        name
+      }
+      userPin: tasks_tree_removal_user {
+        email
+      }
       tasks_tree_removal_images {
         id
         latitude
@@ -93,6 +164,13 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      tasks_collection_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
       debris_type_data {
         name
       }
@@ -112,6 +190,13 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       longitude
       project_id
       created_at
+      tasks_disposal_images {
+        id
+        latitude
+        longitude
+        created_at
+        taken_at_step
+      }
       debris_type_data {
         name
       }

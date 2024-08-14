@@ -3,8 +3,6 @@ import { useParams } from "@tanstack/react-router";
 import { useAllTasksByProjectAndUser } from "../reports/hooks";
 import { formatToEST } from "../utils";
 
-
-
 type TPrintable = {
   created_at: string;
   id: string;
@@ -13,9 +11,28 @@ type TPrintable = {
   longitude: number;
   project_id: string;
   comment: string;
+  project: {
+    name: string;
+  };
+  disposal_site_data?: {
+    name: string;
+  };
+  debris_type_data?: {
+    name: string;
+  };
+  contractor_data?: {
+    name: string;
+  };
+  truck_data?: {
+    truck_number: string;
+  };
+  userPin: {
+    email: string;
+  };
 };
 
 function Printable({ ticket }: { ticket: TPrintable }) {
+  console.log("ticket", ticket);
   return (
     <Box
       className="ticket-page"
@@ -45,6 +62,14 @@ function Printable({ ticket }: { ticket: TPrintable }) {
           gap: "8px", // Optional: spacing between items
         }}
       >
+        <Box>
+          <Typography textColor="text.secondary" level="body-sm">
+            User
+          </Typography>
+          <Typography level="body-sm" textColor="text.primary">
+            {ticket.userPin.email}
+          </Typography>
+        </Box>
         <Box>
           <Typography textColor="text.secondary" level="body-sm">
             Created At:
@@ -86,9 +111,53 @@ function Printable({ ticket }: { ticket: TPrintable }) {
             Project ID:
           </Typography>
           <Typography level="body-sm" textColor="text.primary">
-            {ticket.project_id}
+            {ticket.project.name}
           </Typography>
         </Box>
+
+        {ticket.debris_type_data && (
+          <Box>
+            <Typography textColor="text.secondary" level="body-sm">
+              Debris Type:
+            </Typography>
+            <Typography level="body-sm" textColor="text.primary">
+              {ticket.debris_type_data.name}
+            </Typography>
+          </Box>
+        )}
+
+        {ticket.contractor_data && (
+          <Box>
+            <Typography textColor="text.secondary" level="body-sm">
+              Contractor:
+            </Typography>
+            <Typography level="body-sm" textColor="text.primary">
+              {ticket.contractor_data.name}
+            </Typography>
+          </Box>
+        )}
+
+        {ticket.truck_data && (
+          <Box>
+            <Typography textColor="text.secondary" level="body-sm">
+              Truck Number:
+            </Typography>
+            <Typography level="body-sm" textColor="text.primary">
+              {ticket.truck_data.truck_number}
+            </Typography>
+          </Box>
+        )}
+
+        {ticket.disposal_site_data && (
+          <Box>
+            <Typography textColor="text.secondary" level="body-sm">
+              Disposal Site:
+            </Typography>
+            <Typography level="body-sm" textColor="text.primary">
+              {ticket.disposal_site_data.name}
+            </Typography>
+          </Box>
+        )}
 
         <Box>
           <Typography textColor="text.secondary" level="body-sm">
