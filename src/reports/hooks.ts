@@ -14,6 +14,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     ) {
       id
       latitude
+      comment
       longitude
       project {
         name
@@ -49,6 +50,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       id
       latitude
       longitude
+      comment
       project {
         name
       }
@@ -85,6 +87,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     ) {
       id
       project_id
+      comment
       created_at
       user_id
       project {
@@ -109,6 +112,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     ) {
       id
       latitude
+      comment
       longitude
       project {
         name
@@ -137,6 +141,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     ) {
       id
       project_id
+      comment
       created_at
       user_id
       project {
@@ -163,6 +168,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       latitude
       longitude
       project_id
+      comment
       created_at
       tasks_collection_images {
         id
@@ -187,6 +193,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_disposal(where: { project_id: { _eq: $project_id } }) {
       id
       latitude
+      comment
       longitude
       project_id
       created_at
@@ -216,6 +223,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_stump_removal(where: { project_id: { _eq: $project_id } }) {
       id
       project_id
+      comment
       created_at
       user_id
       tasks_branch_removal_user {
@@ -233,6 +241,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       id
       latitude
       longitude
+      comment
       project_id
       created_at
       user_id
@@ -253,6 +262,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       id
       project_id
       created_at
+      comment
       user_id
       tasks_tree_removal_user {
         email
