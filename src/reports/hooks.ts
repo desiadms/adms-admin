@@ -291,6 +291,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                   return {
                     taskId: task.id,
                     createdAt: task.created_at,
+                    comment: task.comment,
                     taskName: "Stump Removal",
                     imageId: stumpRemovalImage.id,
                     id: stumpRemovalImage.id,
@@ -317,6 +318,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                   taskId: task.id,
                   createdAt: task.created_at,
                   taskName: "Tree Removal",
+                  comment: task.comment,
                   imageId: treeRemovalImage.id,
                   userPin: task.tasks_tree_removal_user?.email,
                   id: treeRemovalImage.id,
@@ -340,6 +342,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 return {
                   taskId: task.id,
                   createdAt: task.created_at,
+                  comment: task.comment,
                   imageId: taskTicketingImages.id,
                   userPin: task.tasks_ticketing_user?.email,
                   taskName: task.task_ticketing_name?.name,
@@ -365,6 +368,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return {
                 taskId: task.id,
                 taskName: "Collection",
+                comment: task.comment,
                 createdAt: task.created_at,
                 userPin: task.tasks_collection_user?.email,
                 imageId: undefined,
@@ -387,6 +391,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 taskId: task.id,
                 taskName: "Disposal",
                 createdAt: task.created_at,
+                comment: task.comment,
                 userPin: task.tasks_disposal_user?.email,
                 imageId: undefined,
                 truckNumber: task.truck_data?.truck_number,

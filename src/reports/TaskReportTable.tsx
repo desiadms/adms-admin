@@ -80,7 +80,6 @@ export function TaskReportTable() {
             return formatToEST(params.value);
           },
         },
-
         {
           field: "latitude",
           headerName: "Latitude",
@@ -119,7 +118,10 @@ export function TaskReportTable() {
               : "-";
           },
         },
-
+        {
+          field: 'comment',
+        headerName: 'Comment'
+        },
         {
           field: "imageId",
           headerName: "Image",
