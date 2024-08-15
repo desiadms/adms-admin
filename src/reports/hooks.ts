@@ -113,6 +113,9 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       id
       latitude
       comment
+      task_ticketing_name {
+        name
+      }
       longitude
       project {
         name
@@ -341,6 +344,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return task.images.map((taskTicketingImages) => {
                 return {
                   taskId: task.id,
+                  ticketingName: task.task_ticketing_name?.name,
                   createdAt: task.created_at,
                   comment: task.comment,
                   imageId: taskTicketingImages.id,

@@ -11,6 +11,9 @@ type TPrintable = {
   longitude: number;
   project_id: string;
   comment: string;
+  task_ticketing_name?: {
+    name: string;
+  };
   project: {
     name: string;
   };
@@ -62,6 +65,16 @@ function Printable({ ticket }: { ticket: TPrintable }) {
           gap: "8px", // Optional: spacing between items
         }}
       >
+        {ticket.task_ticketing_name && (
+          <Box>
+            <Typography textColor="text.secondary" level="body-sm">
+              Type:
+            </Typography>
+            <Typography level="body-sm" textColor="text.primary">
+              {ticket.task_ticketing_name.name}
+            </Typography>
+          </Box>
+        )}
         <Box>
           <Typography textColor="text.secondary" level="body-sm">
             User
