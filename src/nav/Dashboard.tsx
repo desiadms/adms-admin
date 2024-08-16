@@ -7,7 +7,7 @@ import {
 import { Box } from "@mui/system";
 import { Outlet } from "@tanstack/react-router";
 import { Toaster } from "react-hot-toast";
-import { GoOrganization } from "react-icons/go";
+import { GoFile, GoOrganization } from "react-icons/go";
 import { useSingleProjectLinks } from "../projects/hooks";
 import { SidebarLink } from "./Components";
 import { useSideBar } from "./hooks";
@@ -114,6 +114,12 @@ function SidebarContent({ onItemClick }: { onItemClick?: () => void }) {
               to="/projects"
               label="Projects"
               icon={<GoOrganization size={18} />}
+            />
+            <SidebarLink
+              id="task-logs"
+              to="/projects/task-logs"
+              label="Task Logs"
+              icon={<GoFile size={18} />}
             />
           </Stack>
 

@@ -308,6 +308,16 @@ const singleProjectEditContractorsRoute = createRoute({
   errorComponent: () => "Oh crap task report!",
 });
 
+const taskLogsRoute = createRoute({
+  getParentRoute: () => projectsRoute,
+  path: "task-logs",
+  component: lazyRouteComponent(
+    () => import("./task-logs/Table"),
+    "TaskLogsTable",
+  ),
+  errorComponent: () => "Oh crap task report!",
+});
+
 declare module "@tanstack/react-router" {
   interface Register {
     router: typeof router;
@@ -317,6 +327,7 @@ declare module "@tanstack/react-router" {
 const routeTree = rootRoute.addChildren([
   homeRoute,
   projectsRoute.addChildren([
+    taskLogsRoute,
     projectsHomeRoute,
     projectCreateRoute,
     singleProjectRoute.addChildren([

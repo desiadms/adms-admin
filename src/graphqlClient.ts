@@ -1,4 +1,4 @@
-import { ApolloClient, InMemoryCache, createHttpLink } from "@apollo/client";
+import { ApolloClient, InMemoryCache, NormalizedCacheObject, createHttpLink } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { ClientOptions, createClient as createWSClient } from "graphql-ws";
 
@@ -51,6 +51,8 @@ export function wsClientOpts(url: string, getAccessTokenSilently: TGetToken) {
 
 type TGetToken = () => Promise<string | undefined>;
 
+export let apolloClientApp: ApolloClient<NormalizedCacheObject> | undefined;
+
 export function createApolloClient(token: string | null) {
   const cache = new InMemoryCache();
   const httpLink = createHttpLink({
@@ -66,14 +68,14 @@ export function createApolloClient(token: string | null) {
     };
   });
 
-  const client = new ApolloClient({
+  apolloClientApp = new ApolloClient({
     link: authLink.concat(httpLink),
     cache,
     connectToDevTools: import.meta.env.MODE === "development",
   });
 
-  if (client) {
-    return client;
+  if (apolloClientApp) {
+    return apolloClientApp;
   } else {
     throw new Error(`No client found`);
   }
