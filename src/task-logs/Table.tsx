@@ -17,6 +17,10 @@ export function TaskLogsTable() {
           field: "data",
           headerName: "Data",
           width: 600,
+          valueGetter: (params) => {
+            if (!params.data?.data) return "No JSON data";
+            return JSON.stringify(params.data.data);
+          },
           cellRenderer: (params) => {
             if (!params.data?.data) return "No JSON data";
 
