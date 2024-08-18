@@ -147,6 +147,7 @@ export function Table<TData extends RequiredTableField>({
   rightChildren,
   handleNavigate,
   getContextMenuItems,
+  defaultColDef,
   ...props
 }: ComponentProps<typeof AgGridReact<TData>> &
   Omit<TTableTopToolbar<TData>, "api"> & {
@@ -211,6 +212,7 @@ export function Table<TData extends RequiredTableField>({
             filter: "agTextColumnFilter",
             floatingFilter: true,
             menuTabs: ["filterMenuTab"],
+            ...defaultColDef,
           }}
           tooltipShowDelay={0}
           tooltipHideDelay={0}

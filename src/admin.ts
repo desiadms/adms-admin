@@ -37,7 +37,7 @@ export function useUserSettings() {
   });
 
   const settings = userSettings.data?.usersMetadata_by_pk?.settings;
-  const parsedSettings = settings ? (JSON.parse(settings) as TSettings) : {};
+  const parsedSettings = settings ? (settings as TSettings) : {};
 
   return {
     userSettings: parsedSettings,
@@ -64,7 +64,7 @@ export function useMutateUserSettings() {
     await mutate({
       variables: {
         id: userData?.id,
-        settings: JSON.stringify(newSettings),
+        settings: newSettings,
       },
       update: (cache) => {
         cache.evict({ fieldName: "usersMetadata_by_pk" });

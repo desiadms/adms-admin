@@ -103,7 +103,6 @@ function EditForm({
         metadataMutation = executeMedatataMutation({
           variables: {
             id,
-            // @ts-expect-error - we know we are storing an actual object here
             metadata: { activeProject: parsedActiveProject },
           },
         });

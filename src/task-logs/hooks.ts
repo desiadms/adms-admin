@@ -49,10 +49,22 @@ function useAllTasksSet() {
 
 export function useTaskLogs() {
   const { data, loading } = useQuerySub(queryTaskLogs);
-  const { data: allTasksSet, loading: allTasksSetLoading } = useAllTasksSet();
 
+  const taskLogs = useMemo(() => {
+    return data?.logs.map((log) => {
+      return {
+        ...log,
+        data: log.data as { id: string },
+      };
+    });
+  }, [data]);
+
+  const { data: allTasksSet, loading: allTasksSetLoading } = useAllTasksSet();
   return {
-    data: data?.logs.filter((log) => !allTasksSet.has(log.project_id)) || [],
+    data:
+      taskLogs?.filter((log) => {
+        return !allTasksSet.has(log.data.id);
+      }) || [],
     loading: loading || allTasksSetLoading,
   };
 }
