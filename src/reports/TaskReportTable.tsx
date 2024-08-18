@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
-import { formatToEST } from "../utils";
+import { dateComparator, formatToEST } from "../utils";
 import { useAllTasksByProject } from "./hooks";
 
 function getBase64Image(url: string) {
@@ -75,7 +75,11 @@ export function TaskReportTable() {
         { field: "taskName", headerName: "Task Name" },
         {
           field: "createdAt",
+          filter: "agDateColumnFilter",
           headerName: "Created At (EST Time)",
+          filterParams: {
+            comparator: dateComparator,
+          },
           valueFormatter: (params) => {
             return formatToEST(params.value);
           },
@@ -119,8 +123,8 @@ export function TaskReportTable() {
           },
         },
         {
-          field: 'comment',
-        headerName: 'Comment'
+          field: "comment",
+          headerName: "Comment",
         },
         {
           field: "imageId",

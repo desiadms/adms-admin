@@ -1,7 +1,20 @@
-import { Box, Divider, Typography } from "@mui/joy";
+import {
+  Box,
+  Divider,
+  FormControl,
+  FormLabel,
+  Input,
+  Typography,
+} from "@mui/joy";
 import { useParams } from "@tanstack/react-router";
+import { useMemo, useState } from "react";
 import { useAllTasksByProjectAndUser } from "../reports/hooks";
-import { formatToEST } from "../utils";
+import {
+  dateComparator,
+  formatToEST,
+  fromDateObjectToDateInput,
+  midnightDate,
+} from "../utils";
 
 type TPrintable = {
   created_at: string;
@@ -35,7 +48,6 @@ type TPrintable = {
 };
 
 function Printable({ ticket }: { ticket: TPrintable }) {
-  console.log("ticket", ticket);
   return (
     <Box
       className="ticket-page"
@@ -185,11 +197,26 @@ function Printable({ ticket }: { ticket: TPrintable }) {
   );
 }
 
+const twodaysAgoAtMidnight = new Date();
+twodaysAgoAtMidnight.setDate(twodaysAgoAtMidnight.getDate() - 2);
+twodaysAgoAtMidnight.setHours(0, 0, 0, 0);
+
 export function UserTasks() {
   const { project, user } = useParams({
     from: "/projects/$project/users/$user/tasks",
   });
   const { data, loading, error } = useAllTasksByProjectAndUser(project, user);
+
+  const [greaterThan, setGreaterThan] = useState<Date>(twodaysAgoAtMidnight);
+  const inputValue = fromDateObjectToDateInput(greaterThan);
+
+  const filterGreaterThanData = useMemo(
+    () =>
+      data?.filter((task) => {
+        return dateComparator(greaterThan, task.created_at) > -1;
+      }),
+    [data, greaterThan],
+  );
 
   if (loading) return <Box>Loading...</Box>;
   if (error) return <Box>Error: {error.message}</Box>;
@@ -197,7 +224,21 @@ export function UserTasks() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 4 }}>
-      {data.map((ticket) => (
+      <FormControl>
+        <FormLabel sx={{ textTransform: "capitalize" }}>
+          filter Date from
+        </FormLabel>
+
+        <Input
+          sx={{ width: "fit-content" }}
+          type="date"
+          value={inputValue}
+          onChange={(e) => {
+            setGreaterThan(midnightDate(new Date(e.target.value)));
+          }}
+        />
+      </FormControl>
+      {filterGreaterThanData?.map((ticket) => (
         <Printable key={ticket.id} ticket={ticket} />
       ))}
     </Box>
