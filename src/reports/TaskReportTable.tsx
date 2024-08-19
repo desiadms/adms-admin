@@ -41,6 +41,7 @@ async function generateBase64ImagesMap(
         if (base64ImagesMap.has(task.imageId)) return;
         const url = await nhost.storage.getPresignedUrl({
           fileId: task.imageId,
+          width: 400,
         });
         const base64 = await getBase64Image(url.presignedUrl?.url || "");
         base64ImagesMap.set(task.imageId, base64);
@@ -139,7 +140,8 @@ export function TaskReportTable() {
   const columnDefs = useMemo(
     () =>
       [
-        { field: "id", headerName: "ID" },
+        { field: "id", headerName: "ID", hide: true },
+        { field: "taskId", headerName: "Task ID" },
         { headerName: "Project", valueGetter: () => projectData.data?.name },
 
         {
@@ -174,7 +176,6 @@ export function TaskReportTable() {
           headerName: "Latitude",
         },
         { field: "longitude", headerName: "Longitude" },
-        { field: "taskId", headerName: "Task ID" },
         {
           headerName: "Truck Number",
           valueGetter: (params) => {
@@ -214,11 +215,23 @@ export function TaskReportTable() {
             if (!params.data?.imageId) return "No Image";
             const url = nhost.storage.getPublicUrl({
               fileId: params.data?.imageId,
+              width: 100,
             });
 
             return (
               <img src={url} alt="task" style={{ width: 100, height: 100 }} />
             );
+          },
+        },
+        {
+          headerName: "Image Link",
+          valueGetter: (params) => {
+            if (!params.data?.imageId) return "No Image";
+            const url = nhost.storage.getPublicUrl({
+              fileId: params.data?.imageId,
+            });
+
+            return url;
           },
         },
       ] satisfies ColDef<TData>[],
@@ -257,15 +270,15 @@ export function TaskReportTable() {
         const base64ImagesMap = await asyncBase64ImagesMap;
 
         api.exportDataAsExcel({
-          rowHeight: 200,
+          rowHeight: 100,
           addImageToCell: (rowIndex, column, value) => {
             if (column.getColId() === "imageId" && value.length) {
               const image: ExcelImage = {
                 id: rowIndex.toString(),
                 base64: base64ImagesMap.get(value) || "",
                 imageType: "png",
-                height: 200,
-                width: 200,
+                height: 100,
+                width: 100,
               };
 
               return {
