@@ -62,9 +62,9 @@ function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
   const [executeImageMutation] = useMutation(deleteTaskImage);
 
   if (!params.data) return null;
-  const { cacheKey, projectId } = params.data;
+  const { projectId } = params.data;
 
-  if (!cacheKey || !projectId) return null;
+  if (!projectId) return null;
 
   const { imageId, taskId } = params.data;
 
@@ -155,8 +155,7 @@ export function TaskReportTable() {
           headerName: "Comment",
         },
         {
-          headerName: "delete",
-          field: "id",
+          headerName: "Delete",
           cellRenderer: DeleteTaskButton,
         },
         {

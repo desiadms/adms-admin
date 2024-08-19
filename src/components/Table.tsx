@@ -116,10 +116,12 @@ export function Table<TData extends RequiredTableField>({
   handleNavigate,
   getContextMenuItems,
   defaultColDef,
+  disableSearch,
   ...props
 }: ComponentProps<typeof AgGridReact<TData>> &
   Omit<TTableTopToolbar<TData>, "api"> & {
     handleNavigate?: (params?: TData) => void;
+    disableSearch?: boolean;
   }) {
   const darkMode = useDarkMode();
   const {
@@ -155,11 +157,13 @@ export function Table<TData extends RequiredTableField>({
   return (
     <Box sx={{ height: pageContainerHeight }}>
       {api ? (
-        <TableTopToolbar
-          api={api}
-          rightChildren={rightChildren}
-          leftChildren={leftChildren}
-        />
+        !disableSearch && (
+          <TableTopToolbar
+            api={api}
+            rightChildren={rightChildren}
+            leftChildren={leftChildren}
+          />
+        )
       ) : (
         <Box sx={{ height: tableTopToolbarHeight }} />
       )}

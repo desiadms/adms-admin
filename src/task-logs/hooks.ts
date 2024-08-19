@@ -29,6 +29,14 @@ const queryTaskLogs = graphql(/* GraphQL */ `
   }
 `);
 
+export const deleteTaskLogMutation = graphql(/* GraphQL */ `
+  mutation DeleteTaskLog($id: String!) {
+    delete_logs_by_pk(id: $id) {
+      id
+    }
+  }
+`);
+
 function useAllTasks() {
   return useQuery(queryAllTaskIds);
 }
