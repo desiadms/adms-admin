@@ -8,12 +8,13 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
   query AllTasksByProjectAndUser($project_id: uuid!, $user_id: uuid!) {
     tasks_collection(
       where: {
-        _and: { project_id: { _eq: $project_id } }
+        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
         user_id: { _eq: $user_id }
       }
     ) {
       id
       latitude
+      _deleted
       comment
       longitude
       project {
@@ -21,7 +22,11 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       }
       project_id
       created_at
-      tasks_collection_images {
+      tasks_collection_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -43,12 +48,13 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_disposal(
       where: {
-        _and: { project_id: { _eq: $project_id } }
+        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
         user_id: { _eq: $user_id }
       }
     ) {
       id
       latitude
+      _deleted
       longitude
       comment
       project {
@@ -56,7 +62,11 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       }
       project_id
       created_at
-      tasks_disposal_images {
+      tasks_disposal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -81,13 +91,14 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_stump_removal(
       where: {
-        _and: { project_id: { _eq: $project_id } }
+        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
         user_id: { _eq: $user_id }
       }
     ) {
       id
       project_id
       comment
+      _deleted
       created_at
       user_id
       project {
@@ -96,7 +107,11 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       userPin: tasks_branch_removal_user {
         email
       }
-      tasks_stump_removal_images {
+      tasks_stump_removal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -106,12 +121,13 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_ticketing(
       where: {
-        _and: { project_id: { _eq: $project_id } }
+        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
         user_id: { _eq: $user_id }
       }
     ) {
       id
       latitude
+      _deleted
       comment
       task_ticketing_name {
         name
@@ -129,7 +145,11 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       task_ticketing_name {
         name
       }
-      images {
+      images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -138,13 +158,14 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_tree_removal(
       where: {
-        _and: { project_id: { _eq: $project_id } }
+        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
         user_id: { _eq: $user_id }
       }
     ) {
       id
       project_id
       comment
+      _deleted
       created_at
       user_id
       project {
@@ -153,7 +174,11 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       userPin: tasks_tree_removal_user {
         email
       }
-      tasks_tree_removal_images {
+      tasks_tree_removal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -166,14 +191,21 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
 
 export const queryAllTasksByProject = graphql(/* GraphQL */ `
   query AllTasksByProject($project_id: uuid!) {
-    tasks_collection(where: { project_id: { _eq: $project_id } }) {
+    tasks_collection(
+      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+    ) {
       id
       latitude
       longitude
       project_id
       comment
+      _deleted
       created_at
-      tasks_collection_images {
+      tasks_collection_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -193,14 +225,21 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
         email
       }
     }
-    tasks_disposal(where: { project_id: { _eq: $project_id } }) {
+    tasks_disposal(
+      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+    ) {
       id
       latitude
       comment
       longitude
+      _deleted
       project_id
       created_at
-      tasks_disposal_images {
+      tasks_disposal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -223,16 +262,23 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
         email
       }
     }
-    tasks_stump_removal(where: { project_id: { _eq: $project_id } }) {
+    tasks_stump_removal(
+      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+    ) {
       id
       project_id
       comment
+      _deleted
       created_at
       user_id
       tasks_branch_removal_user {
         email
       }
-      tasks_stump_removal_images {
+      tasks_stump_removal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -240,10 +286,13 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
         taken_at_step
       }
     }
-    tasks_ticketing(where: { project_id: { _eq: $project_id } }) {
+    tasks_ticketing(
+      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+    ) {
       id
       latitude
       longitude
+      _deleted
       comment
       project_id
       created_at
@@ -254,23 +303,34 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       task_ticketing_name {
         name
       }
-      images {
+      images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
         created_at
       }
     }
-    tasks_tree_removal(where: { project_id: { _eq: $project_id } }) {
+    tasks_tree_removal(
+      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+    ) {
       id
       project_id
       created_at
       comment
+      _deleted
       user_id
       tasks_tree_removal_user {
         email
       }
-      tasks_tree_removal_images {
+      tasks_tree_removal_images(
+        where: {
+          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        }
+      ) {
         id
         latitude
         longitude
@@ -293,6 +353,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 (stumpRemovalImage) => {
                   return {
                     taskId: task.id,
+                    cacheKey: "tasks_stump_removal",
                     createdAt: task.created_at,
                     comment: task.comment,
                     taskName: "Stump Removal",
@@ -319,6 +380,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return task.tasks_tree_removal_images.map((treeRemovalImage) => {
                 return {
                   taskId: task.id,
+                  cacheKey: "tasks_tree_removal",
                   createdAt: task.created_at,
                   taskName: "Tree Removal",
                   comment: task.comment,
@@ -344,6 +406,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
               return task.images.map((taskTicketingImages) => {
                 return {
                   taskId: task.id,
+                  cacheKey: "tasks_ticketing",
                   ticketingName: task.task_ticketing_name?.name,
                   createdAt: task.created_at,
                   comment: task.comment,
@@ -373,6 +436,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
                 taskId: task.id,
                 taskName: "Collection",
                 comment: task.comment,
+                cacheKey: "tasks_collection",
                 createdAt: task.created_at,
                 userPin: task.tasks_collection_user?.email,
                 imageId: undefined,
@@ -393,6 +457,7 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
             tasks: tasks.map((task) => {
               return {
                 taskId: task.id,
+                cacheKey: "tasks_disposal",
                 taskName: "Disposal",
                 createdAt: task.created_at,
                 comment: task.comment,
@@ -458,6 +523,8 @@ export function useAllTasksByProject(projectId: string) {
   });
 
   const flattenedTasksWithImages = useFlattenTasksWithImages(data);
+
+  console.log("dta", flattenedTasksWithImages);
 
   return { loading, data: flattenedTasksWithImages, error };
 }
@@ -536,28 +603,44 @@ export function useTicketingTask() {
   return { data: data?.tasks_ticketing_by_pk, loading, error };
 }
 
-export const deleteTaskMutation = graphql(/* GraphQL */ `
-  mutation DeleteTask($imageId: uuid = "", $taskId: uuid!) {
+export const deleteTaskImage = graphql(/* GraphQL */ `
+  mutation DeleteTaskImage($imageId: uuid!) {
     delete_images_by_pk(id: $imageId) {
       id
     }
+  }
+`);
 
-    delete_tasks_collection_by_pk(id: $taskId) {
+export const deleteTaskMutation = graphql(/* GraphQL */ `
+  mutation DeleteTask($taskId: uuid!) {
+    update_tasks_collection_by_pk(
+      pk_columns: { id: $taskId }
+      _set: { _deleted: true }
+    ) {
       id
     }
-    delete_tasks_disposal_by_pk(id: $taskId) {
+    update_tasks_disposal_by_pk(
+      pk_columns: { id: $taskId }
+      _set: { _deleted: true }
+    ) {
       id
     }
-    delete_tasks_stump_removal_by_pk(id: $taskId) {
+    update_tasks_stump_removal_by_pk(
+      pk_columns: { id: $taskId }
+      _set: { _deleted: true }
+    ) {
       id
     }
-    delete_tasks_ticketing_by_pk(id: $taskId) {
+    update_tasks_ticketing_by_pk(
+      pk_columns: { id: $taskId }
+      _set: { _deleted: true }
+    ) {
       id
     }
-    delete_tasks_tree_removal_by_pk(id: $taskId) {
-      id
-    }
-    delete_task_ids_by_pk(id: $taskId) {
+    update_tasks_tree_removal_by_pk(
+      pk_columns: { id: $taskId }
+      _set: { _deleted: true }
+    ) {
       id
     }
   }

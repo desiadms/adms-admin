@@ -9,7 +9,11 @@ import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
 import { dateComparator, formatToEST } from "../utils";
-import { deleteTaskMutation, useAllTasksByProject } from "./hooks";
+import {
+  deleteTaskImage,
+  deleteTaskMutation,
+  useAllTasksByProject,
+} from "./hooks";
 
 function getBase64Image(url: string) {
   return fetch(url)
@@ -54,23 +58,43 @@ type TData = NonNullable<
 >[number]["tasks"][number];
 
 function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
-  const [executeMutation] = useMutation(deleteTaskMutation);
+  const [executeTaskMutation] = useMutation(deleteTaskMutation);
+  const [executeImageMutation] = useMutation(deleteTaskImage);
 
   if (!params.data) return null;
+  const { cacheKey, projectId } = params.data;
+
+  if (!cacheKey || !projectId) return null;
 
   const { imageId, taskId } = params.data;
 
   function onDeleteTask() {
+    async function deleteTaskImage() {
+      try {
+        if (imageId) {
+          await executeImageMutation({
+            variables: {
+              imageId,
+            },
+          });
+
+          await nhost.storage.delete({ fileId: imageId });
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
     return new Promise((res, rej) => {
       const run = async () => {
         try {
-          await executeMutation({
+          await deleteTaskImage();
+
+          await executeTaskMutation({
             variables: {
               taskId: taskId,
-              imageId: imageId,
             },
           });
-          imageId && (await nhost.storage.delete({ fileId: imageId }));
 
           res("Task deleted");
         } catch (e) {
