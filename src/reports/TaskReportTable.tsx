@@ -1,18 +1,15 @@
-import { Box } from "@mui/joy";
+import { useMutation } from "@apollo/client";
+import { Box, Button } from "@mui/joy";
 import { useParams } from "@tanstack/react-router";
-import {
-  ColDef,
-  ExcelImage,
-  GetContextMenuItemsParams,
-  MenuItemDef,
-} from "ag-grid-community";
+import { ColDef, ExcelImage, GridApi } from "ag-grid-community";
+import { CustomCellRendererProps } from "ag-grid-react";
 import { useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
 import { dateComparator, formatToEST } from "../utils";
-import { useAllTasksByProject } from "./hooks";
+import { deleteTaskMutation, useAllTasksByProject } from "./hooks";
 
 function getBase64Image(url: string) {
   return fetch(url)
@@ -52,6 +49,62 @@ async function generateBase64ImagesMap(
   return base64ImagesMap;
 }
 
+type TData = NonNullable<
+  ReturnType<typeof useAllTasksByProject>["data"]
+>[number]["tasks"][number];
+
+function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
+  const [executeMutation] = useMutation(deleteTaskMutation);
+
+  if (!params.data) return null;
+
+  const { imageId, taskId } = params.data;
+
+  function onDeleteTask() {
+    return new Promise((res, rej) => {
+      const run = async () => {
+        try {
+          await executeMutation({
+            variables: {
+              taskId: taskId,
+              imageId: imageId,
+            },
+          });
+          imageId && (await nhost.storage.delete({ fileId: imageId }));
+
+          res("Task deleted");
+        } catch (e) {
+          rej(e);
+        }
+      };
+
+      run();
+    });
+  }
+
+  return (
+    <Button
+      size="sm"
+      color="danger"
+      variant="outlined"
+      onClick={() => {
+        const confirm = window.confirm(
+          "Are you sure you want to delete this task?",
+        );
+        if (confirm) {
+          toast.promise(onDeleteTask(), {
+            loading: "Deleting task...",
+            success: "Task deleted",
+            error: "Failed to delete task",
+          });
+        }
+      }}
+    >
+      Delete Task
+    </Button>
+  );
+}
+
 export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const projectData = useProject();
@@ -62,7 +115,7 @@ export function TaskReportTable() {
   const columnDefs = useMemo(
     () =>
       [
-        { field: "id", headerName: "ID", hide: true },
+        { field: "id", headerName: "ID" },
         { headerName: "Project", valueGetter: () => projectData.data?.name },
 
         {
@@ -83,6 +136,11 @@ export function TaskReportTable() {
           valueFormatter: (params) => {
             return formatToEST(params.value);
           },
+        },
+        {
+          headerName: "delete",
+          field: "id",
+          cellRenderer: DeleteTaskButton,
         },
         {
           field: "latitude",
@@ -140,47 +198,66 @@ export function TaskReportTable() {
             );
           },
         },
-      ] satisfies ColDef<NonNullable<typeof rowData>[number]>[],
+      ] satisfies ColDef<TData>[],
     [projectData],
   );
 
-  const getContextMenuItems = useCallback(
-    (params: GetContextMenuItemsParams) => {
+  const contextMenuItems = useCallback(
+    (params) => {
       return [
         "copy",
         {
-          name: "Export to Excel",
-          action: async () => {
-            const asyncBase64ImagesMap = generateBase64ImagesMap(data);
-
-            toast.promise(asyncBase64ImagesMap, {
-              loading: "Generating images...",
-              success: "Images generated, exporting to Excel...",
-              error: "Failed to generate images",
-            });
-
-            const base64ImagesMap = await asyncBase64ImagesMap;
-            params.api.exportDataAsExcel({
-              rowHeight: 200,
-              addImageToCell: (rowIndex, column, value) => {
-                if (column.getColId() === "imageId" && value.length) {
-                  const image: ExcelImage = {
-                    id: rowIndex.toString(),
-                    base64: base64ImagesMap.get(value) || "",
-                    imageType: "png",
-                    height: 200,
-                    width: 200,
-                  };
-
-                  return {
-                    image,
-                  };
-                }
-              },
-            });
+          name: "Delete Task",
+          action: () => {
+            const id = params.node?.data.id;
+            if (id) {
+              return window.open(`/projects/${project}/tasks/${id}`);
+            }
           },
         },
-      ] satisfies (MenuItemDef | string)[];
+      ];
+    },
+    [project],
+  );
+
+  const rightChildren = useCallback(
+    (api: GridApi) => {
+      async function exportToExcelCallback() {
+        const asyncBase64ImagesMap = generateBase64ImagesMap(data);
+
+        toast.promise(asyncBase64ImagesMap, {
+          loading: "Generating images...",
+          success: "Images generated, exporting to Excel...",
+          error: "Failed to generate images",
+        });
+
+        const base64ImagesMap = await asyncBase64ImagesMap;
+
+        api.exportDataAsExcel({
+          rowHeight: 200,
+          addImageToCell: (rowIndex, column, value) => {
+            if (column.getColId() === "imageId" && value.length) {
+              const image: ExcelImage = {
+                id: rowIndex.toString(),
+                base64: base64ImagesMap.get(value) || "",
+                imageType: "png",
+                height: 200,
+                width: 200,
+              };
+
+              return {
+                image,
+              };
+            }
+          },
+        });
+      }
+
+      return (
+        <Button variant="outlined" size="sm" onClick={exportToExcelCallback}>
+          Export to Excel
+        </Button>
+      );
     },
     [data],
   );
@@ -190,7 +267,8 @@ export function TaskReportTable() {
       <Table
         rowData={rowData}
         columnDefs={columnDefs}
-        getContextMenuItems={getContextMenuItems}
+        rightChildren={rightChildren}
+        getContextMenuItems={contextMenuItems}
       />
     </Box>
   );

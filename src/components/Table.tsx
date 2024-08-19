@@ -1,7 +1,6 @@
-import { Box, Button, IconButton, Input } from "@mui/joy";
+import { Box, IconButton, Input } from "@mui/joy";
 import { useRouterState } from "@tanstack/react-router";
 import {
-  BaseExportParams,
   CellDoubleClickedEvent,
   GetRowIdParams,
   GridApi,
@@ -23,17 +22,6 @@ type TTableTopToolbar<TData> = {
   leftChildren?: ReactNode | ((api: GridApi<TData>) => ReactNode);
   rightChildren?: ReactNode | ((api: GridApi<TData>) => ReactNode);
 };
-
-function handleExport(
-  api: GridApi,
-  exportedRows: BaseExportParams["exportedRows"],
-) {
-  if (api) {
-    api.exportDataAsCsv({ exportedRows });
-  } else {
-    console.error("Grid API not available");
-  }
-}
 
 function TableTopToolbar<TData extends RequiredTableField>({
   leftChildren,
@@ -75,10 +63,6 @@ function TableTopToolbar<TData extends RequiredTableField>({
             gap: 2,
           }}
         >
-          {typeof leftChildren === "function"
-            ? leftChildren(api)
-            : leftChildren}
-
           <Input
             id="search"
             size="sm"
@@ -100,6 +84,11 @@ function TableTopToolbar<TData extends RequiredTableField>({
               ) : null
             }
           />
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
+          {typeof leftChildren === "function"
+            ? leftChildren(api)
+            : leftChildren}
 
           {rightChildren && (
             <Box
@@ -115,27 +104,6 @@ function TableTopToolbar<TData extends RequiredTableField>({
                 : rightChildren}
             </Box>
           )}
-        </Box>
-        <Box
-          sx={{
-            display: "flex",
-            gap: 1,
-          }}
-        >
-          <Button
-            variant="outlined"
-            size="sm"
-            onClick={() => handleExport(api, "all")}
-          >
-            Export All
-          </Button>
-          <Button
-            variant="outlined"
-            size="sm"
-            onClick={() => handleExport(api, "filteredAndSorted")}
-          >
-            Export Filtered View
-          </Button>
         </Box>
       </Box>
     </Box>

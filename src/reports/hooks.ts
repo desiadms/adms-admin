@@ -535,3 +535,30 @@ export function useTicketingTask() {
 
   return { data: data?.tasks_ticketing_by_pk, loading, error };
 }
+
+export const deleteTaskMutation = graphql(/* GraphQL */ `
+  mutation DeleteTask($imageId: uuid = "", $taskId: uuid!) {
+    delete_images_by_pk(id: $imageId) {
+      id
+    }
+
+    delete_tasks_collection_by_pk(id: $taskId) {
+      id
+    }
+    delete_tasks_disposal_by_pk(id: $taskId) {
+      id
+    }
+    delete_tasks_stump_removal_by_pk(id: $taskId) {
+      id
+    }
+    delete_tasks_ticketing_by_pk(id: $taskId) {
+      id
+    }
+    delete_tasks_tree_removal_by_pk(id: $taskId) {
+      id
+    }
+    delete_task_ids_by_pk(id: $taskId) {
+      id
+    }
+  }
+`);
