@@ -151,6 +151,15 @@ export function TaskReportTable() {
         },
         { field: "taskName", headerName: "Task Name" },
         {
+          field: "comment",
+          headerName: "Comment",
+        },
+        {
+          headerName: "delete",
+          field: "id",
+          cellRenderer: DeleteTaskButton,
+        },
+        {
           field: "createdAt",
           filter: "agDateColumnFilter",
           headerName: "Created At (EST Time)",
@@ -160,11 +169,6 @@ export function TaskReportTable() {
           valueFormatter: (params) => {
             return formatToEST(params.value);
           },
-        },
-        {
-          headerName: "delete",
-          field: "id",
-          cellRenderer: DeleteTaskButton,
         },
         {
           field: "latitude",
@@ -203,10 +207,6 @@ export function TaskReportTable() {
               ? params.data.disposalSite
               : "-";
           },
-        },
-        {
-          field: "comment",
-          headerName: "Comment",
         },
         {
           field: "imageId",
