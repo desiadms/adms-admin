@@ -15,6 +15,7 @@ const queryTaskLogs = graphql(/* GraphQL */ `
   query TaskLogs {
     logs {
       created_at
+      created_at_server
       id
       project {
         name

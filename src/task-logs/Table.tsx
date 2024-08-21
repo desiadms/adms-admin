@@ -183,7 +183,6 @@ export function TaskLogsTable() {
     () =>
       [
         { field: "id", headerName: "ID", hide: true },
-        { field: "user.email", headerName: "User" },
         {
           field: "created_at",
           headerName: "Created At",
@@ -195,7 +194,23 @@ export function TaskLogsTable() {
             return formatToEST(params.value);
           },
         },
-        { field: "project.name", headerName: "Project ID" },
+        {
+          field: "created_at_server",
+          headerName: "Created At Server",
+          filter: "agDateColumnFilter",
+          filterParams: {
+            comparator: dateComparator,
+          },
+          valueFormatter: (params) => {
+            return formatToEST(params.value);
+          },
+        },
+        {
+          field: "user.email",
+          headerName: "User Email",
+        },
+        { headerName: "Synch", cellRenderer: SynchTask },
+        { headerName: "Delete", cellRenderer: DeleteLogButton },
         {
           field: "data",
           headerName: "Data",
@@ -214,10 +229,18 @@ export function TaskLogsTable() {
             return <pre>{JSON.stringify(params.data.data, null, 4)}</pre>;
           },
         },
-        { headerName: "Synch", cellRenderer: SynchTask },
-
-        { headerName: "Delete", cellRenderer: DeleteLogButton },
+        {
+          field: "data.id",
+          headerName: "Task ID",
+        },
         { field: "type", headerName: "Type" },
+
+        {
+          field: "user.id",
+          headerName: "User ID",
+        },
+
+        { field: "project.name", headerName: "Project ID" },
       ] satisfies ColDef<NonNullable<typeof data>[number]>[],
     [],
   );
