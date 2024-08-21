@@ -524,8 +524,6 @@ export function useAllTasksByProject(projectId: string) {
 
   const flattenedTasksWithImages = useFlattenTasksWithImages(data);
 
-  console.log("dta", flattenedTasksWithImages);
-
   return { loading, data: flattenedTasksWithImages, error };
 }
 

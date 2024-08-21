@@ -4,10 +4,15 @@ import { ColDef } from "ag-grid-community";
 import { CustomCellRendererProps } from "ag-grid-react";
 import { useMemo, useState } from "react";
 import toast from "react-hot-toast";
+import * as R from "remeda";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { dateComparator, formatToEST } from "../utils";
-import { deleteTaskLogMutation, useTaskLogs } from "./hooks";
+import {
+  deleteTaskLogMutation,
+  upsertTicketingTasks,
+  useTaskLogs,
+} from "./hooks";
 
 type TData = NonNullable<ReturnType<typeof useTaskLogs>["data"]>[number];
 
@@ -56,6 +61,83 @@ function DeleteLogButton(params: CustomCellRendererProps<TData>) {
       }}
     >
       Delete Log
+    </Button>
+  );
+}
+
+type TicketingTaskLog = {
+  id: string;
+  images: {
+    id: string;
+    latitude: number;
+    longitude: number;
+    created_at: string;
+    updated_at: string;
+    base64Preview: string;
+  }[];
+  comment: string;
+  _deleted: boolean;
+  latitude: number;
+  longitude: number;
+  created_at: string;
+  updated_at: string;
+  ticketing_name: string;
+  task_ticketing_name: {
+    name: string;
+  };
+};
+
+function SynchTask(params: CustomCellRendererProps<TData>) {
+  const [execTicketingMutation] = useMutation(upsertTicketingTasks);
+  if (!params.data) return null;
+  const {
+    type,
+    project_id,
+    user: { id: user_id },
+  } = params.data;
+  if (!type) return null;
+
+  // here we are lying - but it's fine we want to try and synch the task
+  const data = params.data.data as TicketingTaskLog;
+  const taskId = data.id;
+  const images = data.images?.map((image) => ({
+    ...R.omit(image, ["base64Preview"]),
+    task_id: taskId,
+    user_id,
+  }));
+  const taskIds = [{ id: taskId }];
+  const variableTasks = [
+    { ...R.omit(data, ["images", "task_ticketing_name"]), project_id, user_id },
+  ];
+
+  return (
+    <Button
+      size="sm"
+      color="primary"
+      variant="outlined"
+      onClick={() => {
+        const confirm = window.confirm(
+          "Are you sure you want to synch this task?",
+        );
+        if (confirm) {
+          toast.promise(
+            execTicketingMutation({
+              variables: {
+                tasks: variableTasks,
+                taskIds: taskIds,
+                images: images,
+              },
+            }),
+            {
+              loading: "Synching task...",
+              success: "Task synched",
+              error: "Failed to synch task",
+            },
+          );
+        }
+      }}
+    >
+      Synch Task
     </Button>
   );
 }
@@ -132,6 +214,8 @@ export function TaskLogsTable() {
             return <pre>{JSON.stringify(params.data.data, null, 4)}</pre>;
           },
         },
+        { headerName: "Synch", cellRenderer: SynchTask },
+
         { headerName: "Delete", cellRenderer: DeleteLogButton },
         { field: "type", headerName: "Type" },
       ] satisfies ColDef<NonNullable<typeof data>[number]>[],

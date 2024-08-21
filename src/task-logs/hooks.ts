@@ -23,6 +23,7 @@ const queryTaskLogs = graphql(/* GraphQL */ `
       project_id
       type
       user {
+        id
         email
       }
     }
@@ -76,3 +77,42 @@ export function useTaskLogs() {
     loading: loading || allTasksSetLoading,
   };
 }
+
+export const upsertTicketingTasks = graphql(/* GraphQL */ `
+  mutation UpsertTicketingTask(
+    $tasks: [tasks_ticketing_insert_input!]!
+    $images: [images_insert_input!]!
+    $taskIds: [task_ids_insert_input!]!
+  ) {
+    insert_task_ids(
+      objects: $taskIds
+      on_conflict: { constraint: task_ids_pkey, update_columns: id }
+    ) {
+      returning {
+        id
+      }
+    }
+    insert_tasks_ticketing(
+      objects: $tasks
+      on_conflict: {
+        update_columns: [comment, updated_at, _deleted]
+        constraint: task_admin_pkey
+      }
+    ) {
+      returning {
+        id
+      }
+    }
+    insert_images(
+      objects: $images
+      on_conflict: {
+        constraint: images_pkey
+        update_columns: [latitude, longitude, updated_at, _deleted]
+      }
+    ) {
+      returning {
+        id
+      }
+    }
+  }
+`);
