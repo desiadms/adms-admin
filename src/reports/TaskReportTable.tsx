@@ -215,7 +215,6 @@ export function TaskReportTable() {
             if (!params.data?.imageId) return "No Image";
             const url = nhost.storage.getPublicUrl({
               fileId: params.data?.imageId,
-              width: 100,
             });
 
             return (

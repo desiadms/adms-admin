@@ -97,45 +97,49 @@ function SynchTask(params: CustomCellRendererProps<TData>) {
   } = params.data;
   if (!type) return null;
 
-  // here we are lying - but it's fine we want to try and synch the task
-  const data = params.data.data as TicketingTaskLog;
-  const taskId = data.id;
-  const images = data.images?.map((image) => ({
-    ...R.omit(image, ["base64Preview"]),
-    task_id: taskId,
-    user_id,
-  }));
-  const taskIds = [{ id: taskId }];
-  const variableTasks = [
-    { ...R.omit(data, ["images", "task_ticketing_name"]), project_id, user_id },
-  ];
+  function synchTaskCallback() {
+    // here we are lying - but it's fine we want to try and synch the task
+    const data = params?.data?.data as TicketingTaskLog;
+    const taskId = data.id;
+    const images = data.images?.map((image) => ({
+      ...R.omit(image, ["base64Preview"]),
+      task_id: taskId,
+      user_id,
+    }));
+    const taskIds = [{ id: taskId }];
+    const variableTasks = [
+      {
+        ...R.omit(data, ["images", "task_ticketing_name"]),
+        project_id,
+        user_id,
+      },
+    ];
+
+    const confirm = window.confirm("Are you sure you want to synch this task?");
+    if (confirm) {
+      toast.promise(
+        execTicketingMutation({
+          variables: {
+            tasks: variableTasks,
+            taskIds: taskIds,
+            images: images,
+          },
+        }),
+        {
+          loading: "Synching task...",
+          success: "Task synched",
+          error: "Failed to synch task",
+        },
+      );
+    }
+  }
 
   return (
     <Button
       size="sm"
       color="primary"
       variant="outlined"
-      onClick={() => {
-        const confirm = window.confirm(
-          "Are you sure you want to synch this task?",
-        );
-        if (confirm) {
-          toast.promise(
-            execTicketingMutation({
-              variables: {
-                tasks: variableTasks,
-                taskIds: taskIds,
-                images: images,
-              },
-            }),
-            {
-              loading: "Synching task...",
-              success: "Task synched",
-              error: "Failed to synch task",
-            },
-          );
-        }
-      }}
+      onClick={synchTaskCallback}
     >
       Synch Task
     </Button>
