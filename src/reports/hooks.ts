@@ -8,7 +8,8 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
   query AllTasksByProjectAndUser($project_id: uuid!, $user_id: uuid!) {
     tasks_collection(
       where: {
-        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -48,7 +49,8 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_disposal(
       where: {
-        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -91,7 +93,8 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_stump_removal(
       where: {
-        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -121,7 +124,8 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_ticketing(
       where: {
-        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -158,7 +162,8 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     }
     tasks_tree_removal(
       where: {
-        _and: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -192,7 +197,10 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
 export const queryAllTasksByProject = graphql(/* GraphQL */ `
   query AllTasksByProject($project_id: uuid!) {
     tasks_collection(
-      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+      where: {
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+      }
     ) {
       id
       latitude
@@ -226,7 +234,10 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
     }
     tasks_disposal(
-      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+      where: {
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+      }
     ) {
       id
       latitude
@@ -263,7 +274,10 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
     }
     tasks_stump_removal(
-      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+      where: {
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+      }
     ) {
       id
       project_id
@@ -287,7 +301,10 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
     }
     tasks_ticketing(
-      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+      where: {
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+      }
     ) {
       id
       latitude
@@ -315,7 +332,10 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
     }
     tasks_tree_removal(
-      where: { project_id: { _eq: $project_id }, _deleted: { _neq: true } }
+      where: {
+        project_id: { _eq: $project_id }
+        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+      }
     ) {
       id
       project_id
@@ -347,27 +367,23 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
     return objectEntries(data)
       .map(([key, tasks]) => {
         if (key === "tasks_stump_removal") {
-          const allImageCoordinates = tasks
-            ?.map((task) => {
-              return task.tasks_stump_removal_images.map(
-                (stumpRemovalImage) => {
-                  return {
-                    taskId: task.id,
-                    cacheKey: "tasks_stump_removal",
-                    createdAt: task.created_at,
-                    comment: task.comment,
-                    taskName: "Stump Removal",
-                    imageId: stumpRemovalImage.id,
-                    id: stumpRemovalImage.id,
-                    userPin: task.tasks_branch_removal_user?.email,
-                    projectId: task.project_id,
-                    latitude: stumpRemovalImage.latitude,
-                    longitude: stumpRemovalImage.longitude,
-                  };
-                },
-              );
-            })
-            .flat();
+          const allImageCoordinates = tasks?.flatMap((task) => {
+            return task.tasks_stump_removal_images.map((stumpRemovalImage) => {
+              return {
+                taskId: task.id,
+                cacheKey: "tasks_stump_removal",
+                createdAt: task.created_at,
+                comment: task.comment,
+                taskName: "Stump Removal",
+                imageId: stumpRemovalImage.id,
+                id: stumpRemovalImage.id,
+                userPin: task.tasks_branch_removal_user?.email,
+                projectId: task.project_id,
+                latitude: stumpRemovalImage.latitude,
+                longitude: stumpRemovalImage.longitude,
+              };
+            });
+          });
 
           return {
             label: "Stump Removal",
@@ -375,25 +391,23 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
             tasks: allImageCoordinates,
           };
         } else if (key === "tasks_tree_removal") {
-          const allImageCoordinates = tasks
-            ?.map((task) => {
-              return task.tasks_tree_removal_images.map((treeRemovalImage) => {
-                return {
-                  taskId: task.id,
-                  cacheKey: "tasks_tree_removal",
-                  createdAt: task.created_at,
-                  taskName: "Tree Removal",
-                  comment: task.comment,
-                  imageId: treeRemovalImage.id,
-                  userPin: task.tasks_tree_removal_user?.email,
-                  id: treeRemovalImage.id,
-                  projectId: task.project_id,
-                  latitude: treeRemovalImage.latitude,
-                  longitude: treeRemovalImage.longitude,
-                };
-              });
-            })
-            .flat();
+          const allImageCoordinates = tasks?.flatMap((task) => {
+            return task.tasks_tree_removal_images.map((treeRemovalImage) => {
+              return {
+                taskId: task.id,
+                cacheKey: "tasks_tree_removal",
+                createdAt: task.created_at,
+                taskName: "Tree Removal",
+                comment: task.comment,
+                imageId: treeRemovalImage.id,
+                userPin: task.tasks_tree_removal_user?.email,
+                id: treeRemovalImage.id,
+                projectId: task.project_id,
+                latitude: treeRemovalImage.latitude,
+                longitude: treeRemovalImage.longitude,
+              };
+            });
+          });
 
           return {
             label: "Tree Removal",
@@ -401,26 +415,24 @@ function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
             tasks: allImageCoordinates,
           };
         } else if (key === "tasks_ticketing") {
-          const allImageCoordinates = tasks
-            ?.map((task) => {
-              return task.images.map((taskTicketingImages) => {
-                return {
-                  taskId: task.id,
-                  cacheKey: "tasks_ticketing",
-                  ticketingName: task.task_ticketing_name?.name,
-                  createdAt: task.created_at,
-                  comment: task.comment,
-                  imageId: taskTicketingImages.id,
-                  userPin: task.tasks_ticketing_user?.email,
-                  taskName: task.task_ticketing_name?.name,
-                  id: taskTicketingImages.id,
-                  projectId: task.project_id,
-                  latitude: taskTicketingImages.latitude,
-                  longitude: taskTicketingImages.longitude,
-                };
-              });
-            })
-            .flat();
+          const allImageCoordinates = tasks?.flatMap((task) => {
+            return task.images.map((taskTicketingImages) => {
+              return {
+                taskId: task.id,
+                cacheKey: "tasks_ticketing",
+                ticketingName: task.task_ticketing_name?.name,
+                createdAt: task.created_at,
+                comment: task.comment,
+                imageId: taskTicketingImages.id,
+                userPin: task.tasks_ticketing_user?.email,
+                taskName: task.task_ticketing_name?.name,
+                id: taskTicketingImages.id,
+                projectId: task.project_id,
+                latitude: taskTicketingImages.latitude,
+                longitude: taskTicketingImages.longitude,
+              };
+            });
+          });
 
           return {
             label: "Task Ticketing",
