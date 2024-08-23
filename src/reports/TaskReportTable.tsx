@@ -130,6 +130,17 @@ function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
   );
 }
 
+function TableImagePreview(params: CustomCellRendererProps<TData>) {
+  if (!params.data?.imageId) return "No Image";
+
+  const url = nhost.storage.getPublicUrl({
+    fileId: params.data?.imageId,
+    width: 100,
+  });
+
+  return <img src={url} alt="task" style={{ width: 100, height: 100 }} />;
+}
+
 export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const projectData = useProject();
@@ -211,16 +222,7 @@ export function TaskReportTable() {
         {
           field: "imageId",
           headerName: "Image",
-          cellRenderer: (params) => {
-            if (!params.data?.imageId) return "No Image";
-            const url = nhost.storage.getPublicUrl({
-              fileId: params.data?.imageId,
-            });
-
-            return (
-              <img src={url} alt="task" style={{ width: 100, height: 100 }} />
-            );
-          },
+          cellRenderer: TableImagePreview,
         },
         {
           headerName: "Image Link",
@@ -235,24 +237,6 @@ export function TaskReportTable() {
         },
       ] satisfies ColDef<TData>[],
     [projectData],
-  );
-
-  const contextMenuItems = useCallback(
-    (params) => {
-      return [
-        "copy",
-        {
-          name: "Delete Task",
-          action: () => {
-            const id = params.node?.data.id;
-            if (id) {
-              return window.open(`/projects/${project}/tasks/${id}`);
-            }
-          },
-        },
-      ];
-    },
-    [project],
   );
 
   const rightChildren = useCallback(
@@ -303,7 +287,6 @@ export function TaskReportTable() {
         rowData={rowData}
         columnDefs={columnDefs}
         rightChildren={rightChildren}
-        getContextMenuItems={contextMenuItems}
       />
     </Box>
   );
