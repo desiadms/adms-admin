@@ -9,7 +9,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     tasks_collection(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -25,7 +25,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       created_at
       tasks_collection_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -50,7 +50,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     tasks_disposal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -66,7 +66,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       created_at
       tasks_disposal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -94,7 +94,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     tasks_stump_removal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -112,7 +112,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       }
       tasks_stump_removal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -125,7 +125,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     tasks_ticketing(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -151,7 +151,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       }
       images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -163,7 +163,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
     tasks_tree_removal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         user_id: { _eq: $user_id }
       }
     ) {
@@ -181,7 +181,7 @@ export const queryAllTasksByProjectAndUser = graphql(/* GraphQL */ `
       }
       tasks_tree_removal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -199,7 +199,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_collection(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
       }
     ) {
       id
@@ -211,7 +211,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       created_at
       tasks_collection_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -236,7 +236,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_disposal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
       }
     ) {
       id
@@ -248,7 +248,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       created_at
       tasks_disposal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -276,7 +276,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_stump_removal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
       }
     ) {
       id
@@ -290,7 +290,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
       tasks_stump_removal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -303,7 +303,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_ticketing(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
       }
     ) {
       id
@@ -322,7 +322,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
       images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
@@ -334,7 +334,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
     tasks_tree_removal(
       where: {
         project_id: { _eq: $project_id }
-        _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+        _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
       }
     ) {
       id
@@ -348,7 +348,7 @@ export const queryAllTasksByProject = graphql(/* GraphQL */ `
       }
       tasks_tree_removal_images(
         where: {
-          _or: [{ _deleted: { _neq: true } }, { _deleted: { _is_null: true } }]
+          _or: [{ _deleted: { _eq: false } }, { _deleted: { _is_null: true } }]
         }
       ) {
         id
