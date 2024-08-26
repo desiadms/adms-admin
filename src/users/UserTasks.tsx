@@ -1,53 +1,16 @@
-import {
-  Box,
-  Divider,
-  FormControl,
-  FormLabel,
-  Input,
-  Typography,
-} from "@mui/joy";
+import { Box, Divider, Typography } from "@mui/joy";
 import { useParams } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { DateRange } from "../components/DateRange";
 import { useAllTasksByProjectAndUser } from "../reports/hooks";
-import {
-  dateComparator,
-  formatToEST,
-  fromDateObjectToDateInput,
-  midnightDate,
-} from "../utils";
+import { formatToEST } from "../utils";
 
-type TPrintable = {
-  created_at: string;
-  id: string;
-  key: string;
-  latitude: number;
-  longitude: number;
-  project_id: string;
-  comment: string;
-  task_ticketing_name?: {
-    name: string;
-  };
-  project: {
-    name: string;
-  };
-  disposal_site_data?: {
-    name: string;
-  };
-  debris_type_data?: {
-    name: string;
-  };
-  contractor_data?: {
-    name: string;
-  };
-  truck_data?: {
-    truck_number: string;
-  };
-  userPin: {
-    email: string;
-  };
-};
-
-function Printable({ ticket }: { ticket: TPrintable }) {
+function Printable({
+  ticket,
+}: {
+  ticket: NonNullable<
+    ReturnType<typeof useAllTasksByProjectAndUser>["data"]
+  >[number];
+}) {
   return (
     <Box
       className="ticket-page"
@@ -65,7 +28,7 @@ function Printable({ ticket }: { ticket: TPrintable }) {
       }}
     >
       <Typography level="body-lg" marginBottom="8px" textColor="text.primary">
-        Ticket Details {ticket.key}
+        Ticket Details {ticket?.key}
       </Typography>
 
       <Divider sx={{ marginBottom: "8px" }} />
@@ -77,7 +40,7 @@ function Printable({ ticket }: { ticket: TPrintable }) {
           gap: "8px", // Optional: spacing between items
         }}
       >
-        {ticket.task_ticketing_name && (
+        {"task_ticketing_name" in ticket && (
           <Box>
             <Typography textColor="text.secondary" level="body-sm">
               Type:
@@ -92,7 +55,7 @@ function Printable({ ticket }: { ticket: TPrintable }) {
             User
           </Typography>
           <Typography level="body-sm" textColor="text.primary">
-            {ticket.userPin.email}
+            {ticket?.userPin?.email}
           </Typography>
         </Box>
         <Box>
@@ -136,11 +99,11 @@ function Printable({ ticket }: { ticket: TPrintable }) {
             Project ID:
           </Typography>
           <Typography level="body-sm" textColor="text.primary">
-            {ticket.project.name}
+            {ticket?.project?.name}
           </Typography>
         </Box>
 
-        {ticket.debris_type_data && (
+        {"debris_type_data" in ticket && (
           <Box>
             <Typography textColor="text.secondary" level="body-sm">
               Debris Type:
@@ -151,35 +114,35 @@ function Printable({ ticket }: { ticket: TPrintable }) {
           </Box>
         )}
 
-        {ticket.contractor_data && (
+        {"contractor_data" in ticket && (
           <Box>
             <Typography textColor="text.secondary" level="body-sm">
               Contractor:
             </Typography>
             <Typography level="body-sm" textColor="text.primary">
-              {ticket.contractor_data.name}
+              {ticket.contractor_data?.name}
             </Typography>
           </Box>
         )}
 
-        {ticket.truck_data && (
+        {"truck_data" in ticket && (
           <Box>
             <Typography textColor="text.secondary" level="body-sm">
               Truck Number:
             </Typography>
             <Typography level="body-sm" textColor="text.primary">
-              {ticket.truck_data.truck_number}
+              {ticket.truck_data?.truck_number}
             </Typography>
           </Box>
         )}
 
-        {ticket.disposal_site_data && (
+        {"disposal_site_data" in ticket && (
           <Box>
             <Typography textColor="text.secondary" level="body-sm">
               Disposal Site:
             </Typography>
             <Typography level="body-sm" textColor="text.primary">
-              {ticket.disposal_site_data.name}
+              {ticket.disposal_site_data?.name}
             </Typography>
           </Box>
         )}
@@ -197,26 +160,11 @@ function Printable({ ticket }: { ticket: TPrintable }) {
   );
 }
 
-const twodaysAgoAtMidnight = new Date();
-twodaysAgoAtMidnight.setDate(twodaysAgoAtMidnight.getDate() - 2);
-twodaysAgoAtMidnight.setHours(0, 0, 0, 0);
-
 export function UserTasks() {
   const { project, user } = useParams({
     from: "/projects/$project/users/$user/tasks",
   });
   const { data, loading, error } = useAllTasksByProjectAndUser(project, user);
-
-  const [greaterThan, setGreaterThan] = useState<Date>(twodaysAgoAtMidnight);
-  const inputValue = fromDateObjectToDateInput(greaterThan);
-
-  const filterGreaterThanData = useMemo(
-    () =>
-      data?.filter((task) => {
-        return dateComparator(greaterThan, task.created_at) > -1;
-      }),
-    [data, greaterThan],
-  );
 
   if (loading) return <Box>Loading...</Box>;
   if (error) return <Box>Error: {error.message}</Box>;
@@ -224,21 +172,8 @@ export function UserTasks() {
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 4, p: 4 }}>
-      <FormControl>
-        <FormLabel sx={{ textTransform: "capitalize" }}>
-          filter Date from
-        </FormLabel>
-
-        <Input
-          sx={{ width: "fit-content" }}
-          type="date"
-          value={inputValue}
-          onChange={(e) => {
-            setGreaterThan(midnightDate(new Date(e.target.value)));
-          }}
-        />
-      </FormControl>
-      {filterGreaterThanData?.map((ticket) => (
+      <DateRange />
+      {data?.map((ticket) => (
         <Printable key={ticket.id} ticket={ticket} />
       ))}
     </Box>

@@ -5,6 +5,7 @@ import { ColDef, ExcelImage, GridApi } from "ag-grid-community";
 import { CustomCellRendererProps } from "ag-grid-react";
 import { useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
+import { DateRange } from "../components/DateRange";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
@@ -153,8 +154,18 @@ export function TaskReportTable() {
       [
         { field: "id", headerName: "ID", hide: true },
         { field: "taskId", headerName: "Task ID" },
+        {
+          field: "createdAt",
+          filter: "agDateColumnFilter",
+          headerName: "Created At (EST Time)",
+          filterParams: {
+            comparator: dateComparator,
+          },
+          valueFormatter: (params) => {
+            return formatToEST(params.value);
+          },
+        },
         { headerName: "Project", valueGetter: () => projectData.data?.name },
-
         {
           field: "userPin",
           headerName: "User Pin",
@@ -171,17 +182,7 @@ export function TaskReportTable() {
           headerName: "Delete",
           cellRenderer: DeleteTaskButton,
         },
-        {
-          field: "createdAt",
-          filter: "agDateColumnFilter",
-          headerName: "Created At (EST Time)",
-          filterParams: {
-            comparator: dateComparator,
-          },
-          valueFormatter: (params) => {
-            return formatToEST(params.value);
-          },
-        },
+
         {
           field: "latitude",
           headerName: "Latitude",
@@ -287,6 +288,7 @@ export function TaskReportTable() {
         rowData={rowData}
         columnDefs={columnDefs}
         rightChildren={rightChildren}
+        leftChildren={DateRange}
       />
     </Box>
   );

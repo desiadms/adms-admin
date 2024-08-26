@@ -55,56 +55,56 @@ function TableTopToolbar<TData extends RequiredTableField>({
           width: "100%",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            flexWrap: "wrap",
-            gap: 2,
-          }}
-        >
-          <Input
-            id="search"
-            size="sm"
-            sx={{ width: 200 }}
-            placeholder="Search..."
-            startDecorator={<IoSearchOutline size={16} />}
-            value={filterText ?? ""}
-            onChange={(e) => {
-              setFilterTextGrid(e.target.value);
+        <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: 2,
             }}
-            endDecorator={
-              filterText ? (
-                <IconButton
-                  aria-label="clear filter"
-                  onClick={() => setFilterTextGrid("")}
-                >
-                  <IoCloseSharp />
-                </IconButton>
-              ) : null
-            }
-          />
-        </Box>
-        <Box sx={{ display: "flex", justifyContent: "space-between", gap: 4 }}>
+          >
+            <Input
+              id="search"
+              size="sm"
+              sx={{ width: 200 }}
+              placeholder="Search..."
+              startDecorator={<IoSearchOutline size={16} />}
+              value={filterText ?? ""}
+              onChange={(e) => {
+                setFilterTextGrid(e.target.value);
+              }}
+              endDecorator={
+                filterText ? (
+                  <IconButton
+                    aria-label="clear filter"
+                    onClick={() => setFilterTextGrid("")}
+                  >
+                    <IoCloseSharp />
+                  </IconButton>
+                ) : null
+              }
+            />
+          </Box>
           {typeof leftChildren === "function"
             ? leftChildren(api)
             : leftChildren}
-
-          {rightChildren && (
-            <Box
-              sx={{
-                display: {
-                  md: "flex",
-                },
-                gap: 1,
-              }}
-            >
-              {typeof rightChildren === "function"
-                ? rightChildren(api)
-                : rightChildren}
-            </Box>
-          )}
         </Box>
+
+        {rightChildren && (
+          <Box
+            sx={{
+              display: {
+                md: "flex",
+              },
+              gap: 1,
+            }}
+          >
+            {typeof rightChildren === "function"
+              ? rightChildren(api)
+              : rightChildren}
+          </Box>
+        )}
       </Box>
     </Box>
   );

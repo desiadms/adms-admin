@@ -18,6 +18,19 @@ export function formatToEST(dateString) {
   return estDate.format("YYYY-MM-DD HH:mm:ss");
 }
 
+export function genUpperLowerDate() {
+  const upperLimit = dayjs();
+  const estDate = upperLimit.tz("America/New_York");
+  const estDateStr = estDate.toISOString();
+
+  const lowerLimit = dayjs().subtract(1, "day");
+  const estLowerDate = lowerLimit.tz("America/New_York");
+  const midnight = estLowerDate.startOf("day");
+  const estLowerDateStr = midnight.toISOString();
+
+  return { upperLimit: estDateStr, lowerLimit: estLowerDateStr };
+}
+
 export function keep<T, U>(
   coll: T[],
   mapperFn: (item: T) => U | null | undefined,

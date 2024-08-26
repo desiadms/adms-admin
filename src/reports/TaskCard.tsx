@@ -1,13 +1,11 @@
 import Card from "@mui/joy/Card";
 import Typography from "@mui/joy/Typography";
 import { useEffect, useState } from "react";
-import { TreeRemovalQuery } from "../__generated__/gql/graphql";
+import { TasksTreeRemovalFragmentFragment } from "../__generated__/gql/graphql";
 import { nhost } from "../nhost";
 import { formatDate } from "../utils";
 
-type TImageData = NonNullable<
-  TreeRemovalQuery["tasks_tree_removal_by_pk"]
->["tasks_tree_removal_images"][number];
+type TImageData = TasksTreeRemovalFragmentFragment["images"][number];
 
 function useFetchImages(imageData: TImageData) {
   const [imageUrl, setImageUrl] = useState("");
