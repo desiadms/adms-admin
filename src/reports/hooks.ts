@@ -584,7 +584,13 @@ export function useAllTasksByProject(projectId: string) {
 
   const flattenedTasks = useMemo(() => {
     const flattenedTasksWithImages = genFlattenTasksWithImages(data);
-    return flattenedTasksWithImages.map((task) => task.tasks).flat();
+    return flattenedTasksWithImages
+      .map((task) => task.tasks)
+      .flat()
+      .sort(
+        (a, b) =>
+          new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
+      );
   }, [data]);
 
   return { loading, data: flattenedTasks, error };
