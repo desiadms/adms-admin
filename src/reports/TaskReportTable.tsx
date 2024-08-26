@@ -37,17 +37,15 @@ async function generateBase64ImagesMap(
 ) {
   // Flatten all tasks into a single array of promises
   const promises =
-    data?.flatMap((task) =>
-      task.tasks.map(async (task) => {
-        if (base64ImagesMap.has(task.imageId)) return;
-        const url = await nhost.storage.getPresignedUrl({
-          fileId: task.imageId,
-          width: 400,
-        });
-        const base64 = await getBase64Image(url.presignedUrl?.url || "");
-        base64ImagesMap.set(task.imageId, base64);
-      }),
-    ) || [];
+    data?.map(async (task) => {
+      if (base64ImagesMap.has(task.imageId)) return;
+      const url = await nhost.storage.getPresignedUrl({
+        fileId: task.imageId,
+        width: 400,
+      });
+      const base64 = await getBase64Image(url.presignedUrl?.url || "");
+      base64ImagesMap.set(task.imageId, base64);
+    }) || [];
 
   // Wait for all promises to resolve
   await Promise.all(promises);
@@ -57,7 +55,7 @@ async function generateBase64ImagesMap(
 
 type TData = NonNullable<
   ReturnType<typeof useAllTasksByProject>["data"]
->[number]["tasks"][number];
+>[number];
 
 function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
   const [executeTaskMutation] = useMutation(deleteTaskMutation);
@@ -146,8 +144,6 @@ export function TaskReportTable() {
   const { project } = useParams({ from: "/projects/$project/task-report/" });
   const projectData = useProject();
   const { data } = useAllTasksByProject(project);
-
-  const rowData = useMemo(() => data.map((task) => task.tasks).flat(), [data]);
 
   const columnDefs = useMemo(
     () =>
@@ -285,7 +281,7 @@ export function TaskReportTable() {
   return (
     <Box>
       <Table
-        rowData={rowData}
+        rowData={data}
         columnDefs={columnDefs}
         rightChildren={rightChildren}
         leftChildren={DateRange}

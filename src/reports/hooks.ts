@@ -304,6 +304,7 @@ function genTaskCommonFields<
   const { image } = task;
   return {
     ...task,
+    id: `${task.id}-${image.id}`,
     taskId: task.id,
     projectId: task.project_id,
     comment: task.comment,
@@ -316,115 +317,107 @@ function genTaskCommonFields<
   };
 }
 
-function useFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
-  return useMemo(() => {
-    if (!data) return [];
-    return objectEntries(data)
-      .map(([key, tasks]) => {
-        if (key === "tasks_stump_removal") {
-          const allImageCoordinates = tasks?.flatMap((task) => {
-            const stumpRemovalTask = readFragment(
-              TasksStumpRemovalFragment,
-              task,
-            );
-            return stumpRemovalTask?.images?.map((stumpRemovalImage) => {
-              return genTaskCommonFields({
-                ...stumpRemovalTask,
-                image: stumpRemovalImage,
-                taskName: "Stump Removal",
-              });
+function genFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
+  if (!data) return [];
+  return objectEntries(data)
+    .map(([key, tasks]) => {
+      if (key === "tasks_stump_removal") {
+        const allImageCoordinates = tasks?.flatMap((task) => {
+          const stumpRemovalTask = readFragment(
+            TasksStumpRemovalFragment,
+            task,
+          );
+          return stumpRemovalTask?.images?.map((stumpRemovalImage) => {
+            return genTaskCommonFields({
+              ...stumpRemovalTask,
+              image: stumpRemovalImage,
+              taskName: "Stump Removal",
             });
           });
+        });
 
-          return {
-            label: "Stump Removal",
-            key,
-            tasks: allImageCoordinates,
-          };
-        } else if (key === "tasks_tree_removal") {
-          const allImageCoordinates = tasks?.flatMap((task) => {
-            const treeRemovalTask = readFragment(
-              TasksTreeRemovalFragment,
-              task,
-            );
-            return treeRemovalTask.images.map((treeRemovalImage) => {
-              return genTaskCommonFields({
-                ...treeRemovalTask,
-                image: treeRemovalImage,
-                taskName: "Tree Removal",
-              });
+        return {
+          label: "Stump Removal",
+          key,
+          tasks: allImageCoordinates,
+        };
+      } else if (key === "tasks_tree_removal") {
+        const allImageCoordinates = tasks?.flatMap((task) => {
+          const treeRemovalTask = readFragment(TasksTreeRemovalFragment, task);
+          return treeRemovalTask.images.map((treeRemovalImage) => {
+            return genTaskCommonFields({
+              ...treeRemovalTask,
+              image: treeRemovalImage,
+              taskName: "Tree Removal",
             });
           });
+        });
 
-          return {
-            label: "Tree Removal",
-            key,
-            tasks: allImageCoordinates,
-          };
-        } else if (key === "tasks_ticketing") {
-          const allImageCoordinates = tasks?.flatMap((task) => {
-            const ticketingTask = readFragment(TasksTicketingFragment, task);
+        return {
+          label: "Tree Removal",
+          key,
+          tasks: allImageCoordinates,
+        };
+      } else if (key === "tasks_ticketing") {
+        const allImageCoordinates = tasks?.flatMap((task) => {
+          const ticketingTask = readFragment(TasksTicketingFragment, task);
 
-            return ticketingTask.images.map((taskTicketingImage) => {
-              return genTaskCommonFields({
-                ...ticketingTask,
-                image: taskTicketingImage,
-                taskName: ticketingTask.task_ticketing_name.name,
-              });
+          return ticketingTask.images.map((taskTicketingImage) => {
+            return genTaskCommonFields({
+              ...ticketingTask,
+              image: taskTicketingImage,
+              taskName: ticketingTask.task_ticketing_name.name,
             });
           });
+        });
 
-          return {
-            label: "Task Ticketing",
-            key,
-            tasks: allImageCoordinates,
-          };
-        } else if (key === "tasks_collection") {
-          return {
-            label: "Collection",
-            key,
-            tasks: tasks.flatMap((task) => {
-              const collectionTask = readFragment(
-                TasksCollectionFragment,
-                task,
-              );
+        return {
+          label: "Task Ticketing",
+          key,
+          tasks: allImageCoordinates,
+        };
+      } else if (key === "tasks_collection") {
+        return {
+          label: "Collection",
+          key,
+          tasks: tasks.flatMap((task) => {
+            const collectionTask = readFragment(TasksCollectionFragment, task);
 
-              return collectionTask.images.map((image) => {
-                return genTaskCommonFields({
-                  ...collectionTask,
-                  taskName: "Collection",
-                  image,
-                  truckNumber: collectionTask.truck_data.truck_number,
-                  debrisSite: collectionTask.debris_type_data.name,
-                  contractorName: collectionTask.contractor_data.name,
-                });
+            return collectionTask.images.map((image) => {
+              return genTaskCommonFields({
+                ...collectionTask,
+                taskName: "Collection",
+                image,
+                truckNumber: collectionTask.truck_data.truck_number,
+                debrisSite: collectionTask.debris_type_data.name,
+                contractorName: collectionTask.contractor_data.name,
               });
-            }),
-          };
-        } else if (key === "tasks_disposal") {
-          return {
-            label: "Disposal",
-            key,
-            tasks: tasks.flatMap((task) => {
-              const disposalTask = readFragment(TasksDisposalFragment, task);
+            });
+          }),
+        };
+      } else if (key === "tasks_disposal") {
+        return {
+          label: "Disposal",
+          key,
+          tasks: tasks.flatMap((task) => {
+            const disposalTask = readFragment(TasksDisposalFragment, task);
 
-              return disposalTask.images.map((image) => {
-                return genTaskCommonFields({
-                  ...disposalTask,
-                  taskName: "Disposal",
-                  image,
-                  truckNumber: disposalTask?.truck_data?.truck_number,
-                  contractorName: disposalTask?.contractor_data?.name,
-                  debrisSite: disposalTask.debris_type_data.name,
-                  disposalSite: disposalTask?.disposal_site_data?.name,
-                });
+            return disposalTask.images.map((image) => {
+              return genTaskCommonFields({
+                ...disposalTask,
+                taskName: "Disposal",
+                image,
+                truckNumber: disposalTask?.truck_data?.truck_number,
+                contractorName: disposalTask?.contractor_data?.name,
+                debrisSite: disposalTask.debris_type_data.name,
+                disposalSite: disposalTask?.disposal_site_data?.name,
               });
-            }),
-          };
-        }
-      })
-      .filter(Boolean);
-  }, [data]);
+            });
+          }),
+        };
+      }
+    })
+    .filter(Boolean);
 }
 
 export function useAllTasksByProjectAndUser(projectId: string, userId: string) {
@@ -589,9 +582,12 @@ export function useAllTasksByProject(projectId: string) {
     skip: !projectId,
   });
 
-  const flattenedTasksWithImages = useFlattenTasksWithImages(data);
+  const flattenedTasks = useMemo(() => {
+    const flattenedTasksWithImages = genFlattenTasksWithImages(data);
+    return flattenedTasksWithImages.map((task) => task.tasks).flat();
+  }, [data]);
 
-  return { loading, data: flattenedTasksWithImages, error };
+  return { loading, data: flattenedTasks, error };
 }
 
 export const queryTreeRemoval = graphql(/* GraphQL */ `
