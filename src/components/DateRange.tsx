@@ -1,8 +1,10 @@
-import { Box, Input } from "@mui/joy";
+import { Box, Button, Input } from "@mui/joy";
+import { IoRefresh } from "react-icons/io5";
 import { useDateRange } from "../reports/hooks";
 
 export function DateRange() {
-  const { setLowerLimit, setUpperLimit, dateRangeInput } = useDateRange();
+  const { setLowerLimit, setUpperLimit, dateRangeInput, refreshUpperLimit } =
+    useDateRange();
   const { lowerLimit, upperLimit } = dateRangeInput;
   return (
     <Box
@@ -26,6 +28,14 @@ export function DateRange() {
         value={upperLimit}
         onChange={(e) => setUpperLimit(e.target.value)}
       />
+      <Button
+        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+        variant="outlined"
+        size="sm"
+        onClick={refreshUpperLimit}
+      >
+        Refresh <IoRefresh />
+      </Button>
     </Box>
   );
 }

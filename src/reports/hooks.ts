@@ -555,6 +555,11 @@ const dateRangeAtom = atom<{ lowerLimit: string; upperLimit: string }>(
 export function useDateRange() {
   const [dateRange, setDateRange] = useAtom(dateRangeAtom);
 
+  function refreshUpperLimit() {
+    const { upperLimit } = genUpperLowerDate();
+    setDateRange((prev) => ({ ...prev, upperLimit }));
+  }
+
   const dateRangeInput = useMemo(() => {
     return {
       lowerLimit: dateRange.lowerLimit.split("T")[0],
@@ -595,6 +600,7 @@ export function useDateRange() {
     dateRangeInput,
     setLowerLimit,
     setUpperLimit,
+    refreshUpperLimit,
   };
 }
 
