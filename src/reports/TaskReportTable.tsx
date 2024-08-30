@@ -35,21 +35,20 @@ const base64ImagesMap = new Map<string, string>();
 async function generateBase64ImagesMap(
   data: ReturnType<typeof useAllTasksByProject>["data"],
 ) {
-  // Flatten all tasks into a single array of promises
   const promises =
     data?.map(async (task) => {
-      if (base64ImagesMap.has(task.imageId)) return;
-      const url = await nhost.storage.getPresignedUrl({
-        fileId: task.imageId,
-        width: 400,
+      task.images?.map(async (image) => {
+        if (base64ImagesMap.has(image.id)) return;
+        const url = nhost.storage.getPublicUrl({
+          fileId: image.id,
+          width: 400,
+        });
+        const base64 = await getBase64Image(url || "");
+        base64ImagesMap.set(image.id, base64);
       });
-      const base64 = await getBase64Image(url.presignedUrl?.url || "");
-      base64ImagesMap.set(task.imageId, base64);
     }) || [];
 
-  // Wait for all promises to resolve
   await Promise.all(promises);
-
   return base64ImagesMap;
 }
 
@@ -66,19 +65,21 @@ function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
 
   if (!projectId) return null;
 
-  const { imageId, taskId } = params.data;
+  const { taskId, images } = params.data;
 
   function onDeleteTask() {
     async function deleteTaskImage() {
       try {
-        if (imageId) {
-          await executeImageMutation({
-            variables: {
-              imageId,
-            },
-          });
+        if (images.length) {
+          images.map(async (image) => {
+            await executeImageMutation({
+              variables: {
+                imageId: image.id,
+              },
+            });
 
-          await nhost.storage.delete({ fileId: imageId });
+            await nhost.storage.delete({ fileId: image.id });
+          });
         }
       } catch (e) {
         console.error(e);
@@ -129,15 +130,23 @@ function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
   );
 }
 
-function TableImagePreview(params: CustomCellRendererProps<TData>) {
-  if (!params.data?.imageId) return "No Image";
+function TableImagesPreview(params: CustomCellRendererProps<TData>) {
+  if (!params.data?.images) return "No Images";
 
-  const url = nhost.storage.getPublicUrl({
-    fileId: params.data?.imageId,
-    width: 100,
+  const urls = params.data.images.map((image) => {
+    return nhost.storage.getPublicUrl({
+      fileId: image.id,
+      width: 100,
+    });
   });
 
-  return <img src={url} alt="task" style={{ width: 100, height: 100 }} />;
+  return (
+    <Box sx={{ display: "flex", gap: 1 }}>
+      {urls.map((url) => (
+        <img src={url} alt="task" style={{ width: 100, height: 100 }} />
+      ))}
+    </Box>
+  );
 }
 
 export function TaskReportTable() {
@@ -217,19 +226,20 @@ export function TaskReportTable() {
           },
         },
         {
-          field: "imageId",
-          headerName: "Image",
-          cellRenderer: TableImagePreview,
+          headerName: "Images",
+          cellRenderer: TableImagesPreview,
         },
         {
-          headerName: "Image Link",
+          headerName: "Image Links",
           valueGetter: (params) => {
-            if (!params.data?.imageId) return "No Image";
-            const url = nhost.storage.getPublicUrl({
-              fileId: params.data?.imageId,
+            if (!params.data?.images) return "No Image(s)";
+            const urls = params.data.images.map((image) => {
+              return nhost.storage.getPublicUrl({
+                fileId: image.id,
+              });
             });
 
-            return url;
+            return urls.join(", ");
           },
         },
       ] satisfies ColDef<TData>[],
