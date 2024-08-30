@@ -4,7 +4,16 @@ import { atom, useAtom } from "jotai";
 import { useCallback, useMemo } from "react";
 import { AllTasksByProjectQuery, Images } from "../__generated__/gql/graphql";
 import { graphql, readFragment } from "../graphql";
+import { nhost } from "../nhost";
 import { genUpperLowerDate, objectEntries, useQuerySub } from "../utils";
+
+export type TImage = {
+  id: string;
+  latitude?: number | null;
+  longitude?: number | null;
+  created_at: string;
+  taken_at_step?: string | null;
+};
 
 export const TasksCollectionFragment = graphql(/* GraphQL */ `
   fragment TasksCollectionFragment on tasks_collection {
@@ -13,6 +22,7 @@ export const TasksCollectionFragment = graphql(/* GraphQL */ `
     _deleted
     comment
     longitude
+    user_id
     project {
       name
     }
@@ -51,6 +61,7 @@ export const TasksDisposalFragment = graphql(/* GraphQL */ `
     _deleted
     comment
     longitude
+    user_id
     project {
       name
     }
@@ -119,6 +130,7 @@ export const TasksTicketingFragment = graphql(/* GraphQL */ `
     latitude
     _deleted
     comment
+    user_id
     task_ticketing_name {
       name
     }
@@ -325,6 +337,13 @@ function extractTaskLatLonFromImages(
   };
 }
 
+function enhanceImage(image: TImage) {
+  return {
+    ...image,
+    url: nhost.storage.getPublicUrl({ fileId: image.id, width: 500 }),
+  };
+}
+
 function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
   if (!data) return [];
   return objectEntries(data)
@@ -340,8 +359,9 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
           return genTaskCommonFields({
             ...stumpRemovalTask,
             ...latLon,
-            images: stumpRemovalTask?.images,
+            images: stumpRemovalTask?.images.map(enhanceImage),
             taskName: "Stump Removal",
+            projectName: stumpRemovalTask.project.name,
           });
         });
 
@@ -359,8 +379,9 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
           return genTaskCommonFields({
             ...treeRemovalTask,
             ...latLon,
-            images: treeRemovalTask.images,
+            images: treeRemovalTask.images.map(enhanceImage),
             taskName: "Tree Removal",
+            projectName: treeRemovalTask?.project?.name,
           });
         });
 
@@ -376,7 +397,8 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
           return genTaskCommonFields({
             ...ticketingTask,
             taskName: ticketingTask.task_ticketing_name.name,
-            images: ticketingTask.images,
+            images: ticketingTask.images.map(enhanceImage),
+            projectName: ticketingTask.project.name,
           });
         });
 
@@ -395,10 +417,11 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
             return genTaskCommonFields({
               ...collectionTask,
               taskName: "Collection",
-              images: collectionTask.images,
-              truckNumber: collectionTask.truck_data.truck_number,
-              debrisSite: collectionTask.debris_type_data.name,
+              projectName: collectionTask.project.name,
+              debrisTypeName: collectionTask.debris_type_data.name,
               contractorName: collectionTask.contractor_data.name,
+              truckNumber: collectionTask.truck_data.truck_number,
+              images: collectionTask.images.map(enhanceImage),
             });
           }),
         };
@@ -412,11 +435,12 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
             return genTaskCommonFields({
               ...disposalTask,
               taskName: "Disposal",
-              images: disposalTask.images,
-              truckNumber: disposalTask?.truck_data?.truck_number,
+              images: disposalTask.images.map(enhanceImage),
+              projectName: disposalTask.project.name,
+              debrisTypeName: disposalTask?.debris_type_data.name,
               contractorName: disposalTask?.contractor_data?.name,
-              debrisSite: disposalTask.debris_type_data.name,
-              disposalSite: disposalTask?.disposal_site_data?.name,
+              truckNumber: disposalTask?.truck_data?.truck_number,
+              disposalSiteName: disposalTask?.disposal_site_data?.name,
             });
           }),
         };
@@ -696,3 +720,6 @@ export const deleteTaskMutation = graphql(/* GraphQL */ `
     }
   }
 `);
+
+type TData = ReturnType<typeof useAllTasksByProject>["data"];
+export type TDataEntry = NonNullable<TData>[number];

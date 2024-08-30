@@ -1,62 +1,313 @@
 import { useMutation } from "@apollo/client";
 import { Box, Button } from "@mui/joy";
+import DialogActions from "@mui/joy/DialogActions";
+import DialogContent from "@mui/joy/DialogContent";
+import DialogTitle from "@mui/joy/DialogTitle";
+import Divider from "@mui/joy/Divider";
+import Modal from "@mui/joy/Modal";
+import ModalDialog from "@mui/joy/ModalDialog";
+import {
+  Document,
+  Image,
+  PDFDownloadLink,
+  Page,
+  StyleSheet,
+  Text,
+  View,
+} from "@react-pdf/renderer";
 import { useParams } from "@tanstack/react-router";
-import { ColDef, ExcelImage, GridApi } from "ag-grid-community";
+import { ColDef, GridApi } from "ag-grid-community";
 import { CustomCellRendererProps } from "ag-grid-react";
-import { useCallback, useMemo } from "react";
-import toast from "react-hot-toast";
+import imageCompression from "browser-image-compression";
+import { useCallback, useMemo, useState } from "react";
+import toast, { LoaderIcon } from "react-hot-toast";
+import * as R from "remeda";
 import { DateRange } from "../components/DateRange";
 import { Table } from "../components/Table";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
-import { dateComparator, formatToEST } from "../utils";
 import {
+  dateComparator,
+  formatToEST,
+  normalizeKeyObjectToLabel,
+} from "../utils";
+import {
+  TDataEntry,
   deleteTaskImage,
   deleteTaskMutation,
   useAllTasksByProject,
 } from "./hooks";
 
-function getBase64Image(url: string) {
-  return fetch(url)
-    .then((response) => response.blob())
-    .then(
-      (blob) =>
-        new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        }),
-    );
+// we need to go from any format to jpg because the pdf library
+// doesn't support webp. yup.
+async function getBase64Image(imageUrl: string) {
+  // Fetch the image as a Blob
+  const response = await fetch(imageUrl);
+  const blob = await response.blob();
+
+  // Check the MIME type to see if it's an image
+  if (!blob.type.startsWith("image/")) {
+    throw new Error("The fetched resource is not an image.");
+  }
+
+  // Convert the Blob to a File
+  const file = new File([blob], "image", { type: blob.type });
+
+  // Compress and convert the file to JPEG
+  const options = { fileType: "image/jpeg", initialQuality: 1 };
+  const compressedFile = await imageCompression(file, options);
+
+  // Read the compressed file as base64
+  return imageCompression.getDataUrlFromFile(compressedFile);
 }
 
 const base64ImagesMap = new Map<string, string>();
 
-async function generateBase64ImagesMap(
-  data: ReturnType<typeof useAllTasksByProject>["data"],
-) {
+async function dataBase64Enahanced(data: TDataEntry[] | undefined) {
   const promises =
     data?.map(async (task) => {
-      task.images?.map(async (image) => {
-        if (base64ImagesMap.has(image.id)) return;
-        const url = nhost.storage.getPublicUrl({
-          fileId: image.id,
-          width: 400,
-        });
-        const base64 = await getBase64Image(url || "");
-        base64ImagesMap.set(image.id, base64);
-      });
+      return {
+        ...task,
+        images: await Promise.all(
+          task.images?.map(async (image) => {
+            const cachedBase64 = base64ImagesMap.get(image.id);
+
+            if (cachedBase64)
+              return {
+                ...image,
+                base64: cachedBase64,
+              };
+
+            const base64 = await getBase64Image(image.url || "");
+            base64ImagesMap.set(image.id, base64);
+            return {
+              ...image,
+              base64,
+            };
+          }),
+        ),
+      };
     }) || [];
 
-  await Promise.all(promises);
-  return base64ImagesMap;
+  return await Promise.all(promises);
 }
 
-type TData = NonNullable<
-  ReturnType<typeof useAllTasksByProject>["data"]
->[number];
+const styles = StyleSheet.create({
+  page: {
+    padding: 10,
+    display: "flex",
+    flexDirection: "column",
+    gap: 20,
+  },
+  textAndImage: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 10,
+    padding: "10px 0",
+  },
+  textSection: {
+    width: "50%",
+    display: "flex",
+    gap: 4,
+    overflow: "hidden",
+    wordWrap: "break-word",
+    flexDirection: "column",
+  },
+  imageSection: {
+    width: "50%",
+    flexShrink: 0,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
+  },
+  labelValueContainer: {
+    display: "flex",
+    flexDirection: "row",
+    fontSize: 12,
+    gap: 5,
+  },
+  label: {
+    width: 80,
+    textAlign: "right",
+  },
+  value: {
+    flex: 1,
+  },
+  image: {
+    width: "80%",
+    height: 200,
+    objectFit: "contain",
+  },
+});
 
-function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
+function LabelValue({ label, value }: { label: string; value: string }) {
+  return (
+    <View style={styles.labelValueContainer}>
+      <Text style={styles.label}>{label}:</Text>
+      <Text style={styles.value}>{value}</Text>
+    </View>
+  );
+}
+
+export function TasksForPDF({ data }: { data: TDateEntryPdf[] }) {
+  if (!data) return null;
+
+  return (
+    <Document>
+      <Page size="A4" style={styles.page}>
+        {data.map((task) => {
+          const taskOnlyTextContent = R.omit(task, [
+            "images",
+            "_deleted",
+            "__typename",
+            "created_at",
+            "id",
+            "projectId",
+            "project_id",
+            "user_id",
+            "taskId",
+          ]);
+          return (
+            <View>
+              <Text style={{ fontSize: 18, marginBottom: 10 }}>
+                Task ID: {task.taskId}
+              </Text>
+              <View style={styles.textAndImage} key={task.id}>
+                <View style={styles.textSection}>
+                  {Object.entries(taskOnlyTextContent)
+                    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB))
+                    .map(([key, value]) => {
+                      if (typeof value === "object") return null;
+
+                      return (
+                        <LabelValue
+                          key={key}
+                          label={normalizeKeyObjectToLabel(key)}
+                          value={value?.toString() || ""}
+                        />
+                      );
+                    })}
+                </View>
+                <View style={styles.imageSection}>
+                  {task.images.map((image) => {
+                    return (
+                      <Image
+                        key={image.url}
+                        style={styles.image}
+                        src={image.base64}
+                      />
+                    );
+                  })}
+                </View>
+              </View>
+            </View>
+          );
+        })}
+      </Page>
+    </Document>
+  );
+}
+
+function LoadingContent({
+  disabled,
+  text,
+}: {
+  disabled?: boolean;
+  text: string;
+}) {
+  return (
+    <Button variant="outlined" size="sm" disabled={disabled}>
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        {text} <LoaderIcon />
+      </Box>
+    </Button>
+  );
+}
+
+function DownloadConfirm({ data }: { data: TDateEntryPdf[] }) {
+  return (
+    <PDFDownloadLink
+      document={<TasksForPDF data={data} />}
+      fileName={`tasks-with-images-${new Date().toISOString()}.pdf`}
+    >
+      {({ loading }) => (
+        <>
+          {loading ? (
+            <LoadingContent disabled={true} text="Creating PDF" />
+          ) : (
+            <Button variant="outlined" size="sm">
+              Download Now!
+            </Button>
+          )}
+        </>
+      )}
+    </PDFDownloadLink>
+  );
+}
+
+type TEnhancedImage = TDataEntry["images"][number] & { base64?: string };
+type TDateEntryPdf = Omit<TDataEntry, "images"> & {
+  images: TEnhancedImage[];
+};
+
+function DownloadPdfTasks({ api }: { api: GridApi<TDataEntry> }) {
+  const [open, setOpen] = useState<boolean>(false);
+  const [gatheredData, setGatheredData] = useState<TDateEntryPdf[]>([]);
+
+  async function gatherDataOnModalOpen() {
+    const mutableData: TDataEntry[] = [];
+    api.forEachNodeAfterFilterAndSort((node) => {
+      if (node?.data) mutableData.push(node.data);
+    });
+
+    const enhancedData = await dataBase64Enahanced(mutableData);
+
+    setGatheredData(enhancedData);
+  }
+
+  return (
+    <>
+      <Button
+        variant="outlined"
+        size="sm"
+        onClick={() => {
+          gatherDataOnModalOpen();
+          setOpen(true);
+        }}
+      >
+        Export PDF with Images
+      </Button>
+      <Modal
+        open={open}
+        onClose={() => {
+          setGatheredData([]);
+          setOpen(false);
+        }}
+      >
+        <ModalDialog variant="outlined" role="alertdialog">
+          <DialogTitle>Download PDF</DialogTitle>
+          <Divider />
+          <DialogContent>
+            PDF being generated. It may take a few seconds.
+          </DialogContent>
+          <DialogActions sx={{ flexDirection: "row" }}>
+            {open && gatheredData.length > 0 ? (
+              <DownloadConfirm data={gatheredData} />
+            ) : (
+              <Box>
+                <LoadingContent disabled={true} text="Preparing Data" />
+              </Box>
+            )}
+          </DialogActions>
+        </ModalDialog>
+      </Modal>
+    </>
+  );
+}
+
+function DeleteTaskButton(params: CustomCellRendererProps<TDataEntry>) {
   const [executeTaskMutation] = useMutation(deleteTaskMutation);
   const [executeImageMutation] = useMutation(deleteTaskImage);
 
@@ -130,20 +381,22 @@ function DeleteTaskButton(params: CustomCellRendererProps<TData>) {
   );
 }
 
-function TableImagesPreview(params: CustomCellRendererProps<TData>) {
+function TableImagesPreview(params: CustomCellRendererProps<TDataEntry>) {
   if (!params.data?.images) return "No Images";
 
   const urls = params.data.images.map((image) => {
-    return nhost.storage.getPublicUrl({
-      fileId: image.id,
-      width: 100,
-    });
+    return image.url;
   });
 
   return (
     <Box sx={{ display: "flex", gap: 1 }}>
       {urls.map((url) => (
-        <img src={url} alt="task" style={{ width: 100, height: 100 }} />
+        <img
+          key={url}
+          src={url}
+          alt="task"
+          style={{ width: 100, height: 100 }}
+        />
       ))}
     </Box>
   );
@@ -233,60 +486,44 @@ export function TaskReportTable() {
           headerName: "Image Links",
           valueGetter: (params) => {
             if (!params.data?.images) return "No Image(s)";
-            const urls = params.data.images.map((image) => {
-              return nhost.storage.getPublicUrl({
-                fileId: image.id,
-              });
-            });
-
+            const urls = params.data.images.map((image) => image.url);
             return urls.join(", ");
           },
         },
-      ] satisfies ColDef<TData>[],
+      ] satisfies ColDef<TDataEntry>[],
     [projectData],
   );
 
-  const rightChildren = useCallback(
-    (api: GridApi) => {
-      async function exportToExcelCallback() {
-        const asyncBase64ImagesMap = generateBase64ImagesMap(data);
-
-        toast.promise(asyncBase64ImagesMap, {
-          loading: "Generating images...",
-          success: "Images generated, exporting to Excel...",
-          error: "Failed to generate images",
-        });
-
-        const base64ImagesMap = await asyncBase64ImagesMap;
-
-        api.exportDataAsExcel({
-          rowHeight: 100,
-          addImageToCell: (rowIndex, column, value) => {
-            if (column.getColId() === "imageId" && value.length) {
-              const image: ExcelImage = {
-                id: rowIndex.toString(),
-                base64: base64ImagesMap.get(value) || "",
-                imageType: "png",
-                height: 100,
-                width: 100,
-              };
-
-              return {
-                image,
-              };
-            }
-          },
-        });
-      }
-
-      return (
-        <Button variant="outlined" size="sm" onClick={exportToExcelCallback}>
-          Export to Excel
+  const rightChildren = useCallback((api: GridApi) => {
+    return (
+      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+        <DownloadPdfTasks api={api} />
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={() =>
+            api.exportDataAsCsv({
+              fileName: `tasks-${new Date().toISOString()}.csv`,
+              columnKeys:
+                api
+                  ?.getColumns()
+                  ?.filter((col) => {
+                    const headerName = col.getColDef().headerName;
+                    return (
+                      headerName !== "Images" &&
+                      headerName !== "Delete" &&
+                      headerName !== "ID"
+                    );
+                  })
+                  .map((col) => col.getColId()) || [],
+            })
+          }
+        >
+          Export to CSV
         </Button>
-      );
-    },
-    [data],
-  );
+      </Box>
+    );
+  }, []);
 
   return (
     <Box>

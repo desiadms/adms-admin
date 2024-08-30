@@ -181,3 +181,13 @@ export function fromDateObjectToDateInput(date: Date) {
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
+
+export function normalizeKeyObjectToLabel(text: string) {
+  // Convert camelCase to underscore_case
+  const underscoreCase = text.replace(/([a-z])([A-Z])/g, "$1_$2").toLowerCase();
+
+  // Replace underscores with spaces
+  const displayText = underscoreCase.replace(/_/g, " ");
+
+  return displayText;
+}
