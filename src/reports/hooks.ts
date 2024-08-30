@@ -325,7 +325,7 @@ function extractTaskLatLonFromImages(
   };
 }
 
-function genFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
+function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
   if (!data) return [];
   return objectEntries(data)
     .map(([key, tasks]) => {
@@ -406,7 +406,7 @@ function genFlattenTasksWithImages(data: AllTasksByProjectQuery | undefined) {
         return {
           label: "Disposal",
           key,
-          tasks: tasks.flatMap((task) => {
+          tasks: tasks.map((task) => {
             const disposalTask = readFragment(TasksDisposalFragment, task);
 
             return genTaskCommonFields({
@@ -439,7 +439,7 @@ export function useAllTasksByProjectAndUser(projectId: string, userId: string) {
     skip: !projectId || !userId,
   });
 
-  const flattendTasks = useMemo(() => {
+  const normalizedTasks = useMemo(() => {
     return (
       data &&
       objectEntries(data)
@@ -521,7 +521,7 @@ export function useAllTasksByProjectAndUser(projectId: string, userId: string) {
     );
   }, [data]);
 
-  return { loading, data: flattendTasks, error };
+  return { loading, data: normalizedTasks, error };
 }
 
 const dateRangeAtom = atom<{ lowerLimit: string; upperLimit: string }>(
@@ -588,9 +588,9 @@ export function useAllTasksByProject(projectId: string) {
     skip: !projectId,
   });
 
-  const flattenedTasks = useMemo(() => {
-    const flattenedTasksWithImages = genFlattenTasksWithImages(data);
-    return flattenedTasksWithImages
+  const normalizedData = useMemo(() => {
+    const normalizedTasks = normalizeTasks(data);
+    return normalizedTasks
       .map((task) => task.tasks)
       .flat()
       .sort(
@@ -599,7 +599,7 @@ export function useAllTasksByProject(projectId: string) {
       );
   }, [data]);
 
-  return { loading, data: flattenedTasks, error };
+  return { loading, data: normalizedData, error };
 }
 
 export const queryTreeRemoval = graphql(/* GraphQL */ `
