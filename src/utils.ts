@@ -65,21 +65,11 @@ export function useQuerySub<T, V>(
   query: TypedDocumentNode<T, V>,
   options?: TOptions,
 ) {
-  const {
-    data: queryData,
-    loading: queryLoading,
-    error: queryError,
-  } = useQuery(query, {
+  return useQuery(query, {
     variables: options?.variables,
     skip: options?.skip,
     pollInterval: 2000,
   });
-
-  return {
-    data: queryData,
-    loading: queryLoading,
-    error: queryError,
-  };
 }
 
 export function convertToEmail(id: string) {

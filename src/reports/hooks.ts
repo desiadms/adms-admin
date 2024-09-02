@@ -1,3 +1,4 @@
+import { useQuery } from "@apollo/client";
 import { useParams } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { atom, useAtom } from "jotai";
@@ -609,7 +610,7 @@ export function useAllTasksByProject(projectId: string) {
     dateRangeQuery: { lowerLimit, upperLimit },
   } = useDateRange();
 
-  const { loading, data, error } = useQuerySub(queryAllTasksByProject, {
+  const { loading, data, error } = useQuery(queryAllTasksByProject, {
     variables: {
       project_id: projectId,
       lowerLimit,
