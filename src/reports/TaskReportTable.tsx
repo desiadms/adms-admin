@@ -18,7 +18,7 @@ import {
 import { useParams } from "@tanstack/react-router";
 import { ColDef, GridApi } from "ag-grid-community";
 import { CustomCellRendererProps } from "ag-grid-react";
-import imageCompression from "browser-image-compression";
+import imageCompression, { Options } from "browser-image-compression";
 import { useCallback, useMemo, useState } from "react";
 import toast, { LoaderIcon } from "react-hot-toast";
 import * as R from "remeda";
@@ -38,6 +38,8 @@ import {
   useAllTasksByProject,
 } from "./hooks";
 
+const oneMB = 1024 * 1024;
+
 // we need to go from any format to jpg because the pdf library
 // doesn't support webp. yup.
 async function getBase64Image(imageUrl: string) {
@@ -53,9 +55,15 @@ async function getBase64Image(imageUrl: string) {
   // Convert the Blob to a File
   const file = new File([blob], "image", { type: blob.type });
 
+  const compressionOptions = {
+    maxSizeMB: oneMB,
+    maxWidthOrHeight: 1280,
+    useWebWorker: true,
+    fileType: "image/jpeg",
+  } satisfies Options;
+
   // Compress and convert the file to JPEG
-  const options = { fileType: "image/jpeg", initialQuality: 1 };
-  const compressedFile = await imageCompression(file, options);
+  const compressedFile = await imageCompression(file, compressionOptions);
 
   // Read the compressed file as base64
   return imageCompression.getDataUrlFromFile(compressedFile);
