@@ -1,5 +1,5 @@
 import { Box, Button } from "@mui/joy";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import {
   ColDef,
   GetContextMenuItemsParams,
@@ -9,15 +9,11 @@ import { useCallback, useMemo } from "react";
 import { Table } from "../components/Table";
 import { useProjectOptions } from "../projects/hooks";
 import { convertToPin } from "../utils";
-import { useProjectUsers } from "./hooks";
+import { useAllUsers } from "./hooks";
 
-export function UsersTable({
-  data,
-}: {
-  data: ReturnType<typeof useProjectUsers>["data"];
-}) {
+export function AllUsers() {
+  const { data } = useAllUsers();
   const { data: projectOptions } = useProjectOptions();
-  const { project } = useParams({ from: "/projects/$project/users" });
 
   const columnDefs = useMemo(
     () =>
@@ -57,27 +53,15 @@ export function UsersTable({
             const id = params.node?.data.id;
             if (id) {
               return navigate({
-                to: "/projects/$project/editUser/$user",
-                params: { user: id.toString(), project },
-              });
-            }
-          },
-        },
-        {
-          name: "View All Tickets",
-          action: () => {
-            const id = params.node?.data.id;
-            if (id) {
-              return navigate({
-                to: "/projects/$project/users/$user/tasks",
-                params: { user: id.toString(), project },
+                to: "/allUsers/editUser/$user",
+                params: { user: id.toString() },
               });
             }
           },
         },
       ] satisfies (MenuItemDef | string)[];
     },
-    [navigate, project],
+    [navigate],
   );
 
   return (
@@ -92,8 +76,7 @@ export function UsersTable({
             size="sm"
             onClick={() => {
               navigate({
-                to: "/projects/$project/createUser",
-                params: { project },
+                to: "/allUsers/createUser",
               });
             }}
           >

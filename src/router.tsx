@@ -19,6 +19,37 @@ const homeRoute = createRoute({
   errorComponent: () => "Oh crap!",
 });
 
+const allUsersHomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: "allUsers",
+  component: Outlet,
+  errorComponent: () => "Oh crap!",
+});
+
+const allUsersRoute = createRoute({
+  getParentRoute: () => allUsersHomeRoute,
+  path: "/",
+  component: lazyRouteComponent(() => import("./users/AllUsers"), "AllUsers"),
+  errorComponent: () => "Oh crap!",
+});
+
+const globalCreateUserRoute = createRoute({
+  getParentRoute: () => allUsersHomeRoute,
+  path: "createUser",
+  component: lazyRouteComponent(() => import("./users/Create"), "Create"),
+  errorComponent: () => "Oh crap!",
+});
+
+const globalEditUserRoute = createRoute({
+  getParentRoute: () => allUsersHomeRoute,
+  path: "editUser/$user",
+  component: lazyRouteComponent(
+    () => import("./users/Edit"),
+    "EditFromAllUsers",
+  ),
+  errorComponent: () => "Oh crap!",
+});
+
 const projectsRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: "projects",
@@ -60,7 +91,10 @@ const createUserRoute = createRoute({
 const editUserRoute = createRoute({
   getParentRoute: () => singleProjectRoute,
   path: "editUser/$user",
-  component: lazyRouteComponent(() => import("./users/Edit"), "Edit"),
+  component: lazyRouteComponent(
+    () => import("./users/Edit"),
+    "EditFromProjectUsers",
+  ),
   errorComponent: () => "Oh crap!",
 });
 
@@ -326,6 +360,11 @@ declare module "@tanstack/react-router" {
 
 const routeTree = rootRoute.addChildren([
   homeRoute,
+  allUsersHomeRoute.addChildren([
+    allUsersRoute,
+    globalEditUserRoute,
+    globalCreateUserRoute,
+  ]),
   projectsRoute.addChildren([
     taskLogsRoute,
     projectsHomeRoute,

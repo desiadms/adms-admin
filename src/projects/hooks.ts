@@ -54,17 +54,17 @@ export function useSingleProjectLinks() {
   });
 
   const links: Parameters<typeof TopNav>[number]["links"] = [
+    {
+      id: "tasks",
+      to: "/projects/$project/task-report",
+      label: "Reports",
+      params,
+    },
     { id: "users", to: "/projects/$project/users", label: "Users", params },
     {
       id: "ticketing-names",
       to: "/projects/$project/ticketing-names",
       label: "Ticketing Names",
-      params,
-    },
-    {
-      id: "tasks",
-      to: "/projects/$project/task-report",
-      label: "Reports",
       params,
     },
     {
@@ -89,6 +89,12 @@ export function useSingleProjectLinks() {
       id: "contractors",
       to: "/projects/$project/contractors",
       label: "Contractors",
+      params,
+    },
+    {
+      id: "edit",
+      to: "/projects/$project/edit",
+      label: "Edit Project",
       params,
     },
   ];
@@ -133,3 +139,106 @@ export function useProjectOptions() {
   }, [data]);
   return { data: options, loading, error };
 }
+
+export const deleteAllTasksMutation = graphql(/* GraphQL */ `
+  mutation DeleteTasks($projectId: uuid!) {
+    delete_tasks_collection(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+    delete_tasks_disposal(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+    delete_tasks_stump_removal(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+    delete_tasks_ticketing(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+    delete_tasks_tree_removal(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`);
+
+export const deleteTaskIdsMutation = graphql(/* GraphQL */ `
+  mutation DeleteTaskIds($taskIds: [uuid!]!) {
+    delete_task_ids(where: { id: { _in: $taskIds } }) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`);
+
+export const deleteProjectRelatedDataMutation = graphql(/* GraphQL */ `
+  mutation DeleteProjectRelatedData($projectId: uuid!) {
+    delete_contractors(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_debris_types(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_disposal_sites(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_logs(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_materials(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_trucks(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+    delete_ticketing_names(where: { project_id: { _eq: $projectId } }) {
+      affected_rows
+    }
+  }
+`);
+
+export const deleteProjectMutation = graphql(/* GraphQL */ `
+  mutation DeleteProject($projectId: uuid!) {
+    delete_projects_by_pk(id: $projectId) {
+      id
+    }
+  }
+`);
+
+export const deleteAllProjectImagesMutation = graphql(/* GraphQL */ `
+  mutation DeleteAllProjectImages($projectId: uuid!) {
+    delete_images(
+      where: {
+        task_id_data: {
+          _or: [
+            { tasks_ticketings: { project_id: { _eq: $projectId } } }
+            { tasks_disposals: { project_id: { _eq: $projectId } } }
+            { tasks_collections: { project_id: { _eq: $projectId } } }
+            { tasks_tree_removals: { project_id: { _eq: $projectId } } }
+            { tasks_stump_removals: { project_id: { _eq: $projectId } } }
+          ]
+        }
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`);

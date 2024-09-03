@@ -101,3 +101,14 @@ export function useUser(userId: string) {
 
   return { loading, error, data: projectUser };
 }
+
+export const deleteUserMutation = graphql(/* GraphQL */ `
+  mutation DeleteUser($id: uuid!) {
+    delete_usersMetadata_by_pk(id: $id) {
+      id
+    }
+    deleteUser(id: $id) {
+      id
+    }
+  }
+`);

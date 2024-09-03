@@ -34,7 +34,7 @@ import {
 import {
   TDataEntry,
   deleteTaskImage,
-  deleteTaskMutation,
+  softDeleteTaskMutation,
   useAllTasksByProject,
 } from "./hooks";
 
@@ -316,7 +316,7 @@ function DownloadPdfTasks({ api }: { api: GridApi<TDataEntry> }) {
 }
 
 function DeleteTaskButton(params: CustomCellRendererProps<TDataEntry>) {
-  const [executeTaskMutation] = useMutation(deleteTaskMutation);
+  const [executeTaskMutation] = useMutation(softDeleteTaskMutation);
   const [executeImageMutation] = useMutation(deleteTaskImage);
 
   if (!params.data) return null;

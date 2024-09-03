@@ -693,8 +693,8 @@ export const deleteTaskImage = graphql(/* GraphQL */ `
   }
 `);
 
-export const deleteTaskMutation = graphql(/* GraphQL */ `
-  mutation DeleteTask($taskId: uuid!) {
+export const softDeleteTaskMutation = graphql(/* GraphQL */ `
+  mutation SoftDeleteTask($taskId: uuid!) {
     update_tasks_collection_by_pk(
       pk_columns: { id: $taskId }
       _set: { _deleted: true }

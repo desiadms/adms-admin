@@ -1,7 +1,7 @@
 import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Divider, Typography } from "@mui/joy";
-import { useNavigate, useParams } from "@tanstack/react-router";
+import { useNavigate, useRouterState } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -46,10 +46,12 @@ export function CreateForm({
     },
   });
 
-  const { project } = useParams({ from: "/projects/$project/createUser" });
-
   const [executeMutation] = useMutation(mutationUpsertUser);
   const navigate = useNavigate();
+  const { matches } = useRouterState();
+  const createUserInProject = matches.find(
+    ({ routeId }) => routeId === "/projects/$project/createUser",
+  );
 
   async function onSubmit(data: CrateUserForm) {
     const {
@@ -100,15 +102,16 @@ export function CreateForm({
         error: "Failed to create user",
       });
 
-      if (parsedActiveProject) {
-        navigate({
-          to: "/projects/$project/users",
-          params: {
-            project: parsedActiveProject,
-          },
-        });
+      if (createUserInProject) {
+        "project" in createUserInProject.params &&
+          navigate({
+            to: "/projects/$project/users",
+            params: {
+              project: createUserInProject.params.project,
+            },
+          });
       } else {
-        navigate({ to: "/projects/$project/users", params: { project } });
+        navigate({ to: "/allUsers" });
       }
     } catch (e) {
       console.error(e);
