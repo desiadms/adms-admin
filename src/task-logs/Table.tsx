@@ -10,7 +10,11 @@ import { nhost } from "../nhost";
 import { dateComparator, formatToEST } from "../utils";
 import {
   deleteTaskLogMutation,
+  upsertCollectionTasks,
+  upsertDisposalTasks,
+  upsertStumpRemovalTasks,
   upsertTicketingTasks,
+  upsertTreeRemovalTasks,
   useTaskLogs,
 } from "./hooks";
 
@@ -65,7 +69,7 @@ function DeleteLogButton(params: CustomCellRendererProps<TData>) {
   );
 }
 
-type TicketingTaskLog = {
+type TGeneralTask = {
   id: string;
   images: {
     id: string;
@@ -81,14 +85,54 @@ type TicketingTaskLog = {
   longitude: number;
   created_at: string;
   updated_at: string;
-  ticketing_name: string;
-  task_ticketing_name: {
-    name: string;
-  };
 };
+
+type TicketingTaskLog = {
+  type: "ticketing-task";
+  ticketing_name: string;
+} & TGeneralTask;
+
+type TCollectionDisposalGeneral = {
+  contractor: string;
+  debris_type: string;
+  truck_id: string;
+} & TGeneralTask;
+
+type _TCollectionTaskLog = {
+  type: "collection-task";
+  weigh_points?: {
+    latitude: number;
+    longitude: number;
+  }[];
+} & TCollectionDisposalGeneral;
+
+type _TDisposalTaskLog = {
+  type: "disposal-task";
+  disposal_site: string;
+  load_call: number;
+  task_collection_id: string;
+} & TCollectionDisposalGeneral;
+
+type TTreeStumpRemovalGeneral = {
+  completed?: boolean;
+} & TGeneralTask;
+
+type _TTreeRemovalTaskLog = {
+  type: "tree-removal-task";
+  ranges?: string;
+} & TTreeStumpRemovalGeneral;
+
+type _TStumpRemovalTaskLog = {
+  type: "stump-removal-task";
+} & TTreeStumpRemovalGeneral;
 
 function SynchTask(params: CustomCellRendererProps<TData>) {
   const [execTicketingMutation] = useMutation(upsertTicketingTasks);
+  const [execCollectionMutation] = useMutation(upsertCollectionTasks);
+  const [execDisposalMutation] = useMutation(upsertDisposalTasks);
+  const [execTreeRemovalMutation] = useMutation(upsertTreeRemovalTasks);
+  const [execStumpRemovalMutation] = useMutation(upsertStumpRemovalTasks);
+
   if (!params.data) return null;
   const {
     type,
@@ -99,6 +143,8 @@ function SynchTask(params: CustomCellRendererProps<TData>) {
 
   function synchTaskCallback() {
     // here we are lying - but it's fine we want to try and synch the task
+    const type = params?.data?.type;
+
     const data = params?.data?.data as TicketingTaskLog;
     const taskId = data.id;
     const images = data.images?.map((image) => ({
@@ -107,30 +153,52 @@ function SynchTask(params: CustomCellRendererProps<TData>) {
       user_id,
     }));
     const taskIds = [{ id: taskId }];
+
+    const parsedData =
+      type === "ticketing-task"
+        ? R.omit(data, ["images", "ticketing_name"])
+        : R.omit(data, ["images"]);
+
     const variableTasks = [
       {
-        ...R.omit(data, ["images", "task_ticketing_name"]),
+        ...parsedData,
         project_id,
         user_id,
       },
     ];
 
+    const allVariables = {
+      variables: {
+        tasks: variableTasks,
+        taskIds,
+        images,
+      },
+    };
+
+    const mutation = () => {
+      switch (type) {
+        case "ticketing-task":
+          return execTicketingMutation(allVariables);
+        case "collection-task":
+          return execCollectionMutation(allVariables);
+        case "disposal-task":
+          return execDisposalMutation(allVariables);
+        case "tree-removal-task":
+          return execTreeRemovalMutation(allVariables);
+        case "stump-removal-task":
+          return execStumpRemovalMutation(allVariables);
+        default:
+          return Promise.reject("Invalid task type");
+      }
+    };
+
     const confirm = window.confirm("Are you sure you want to synch this task?");
     if (confirm) {
-      toast.promise(
-        execTicketingMutation({
-          variables: {
-            tasks: variableTasks,
-            taskIds: taskIds,
-            images: images,
-          },
-        }),
-        {
-          loading: "Synching task...",
-          success: "Task synched",
-          error: "Failed to synch task",
-        },
-      );
+      toast.promise(mutation(), {
+        loading: "Synching task...",
+        success: "Task synched",
+        error: "Failed to synch task",
+      });
     }
   }
 
