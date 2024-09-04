@@ -1,7 +1,7 @@
 import { Config, Context } from "@netlify/functions";
 import { SignUpResponse } from "@nhost/hasura-auth-js";
 import { TServerResponse } from "../src/globals";
-import { nhostURL } from "./common";
+import { nhostAuthURL } from "./common";
 
 export type TCreateUserBody = {
   email: string;
@@ -13,7 +13,7 @@ export default async (req: Request, _context: Context) => {
   const { email, password, activeProject } =
     (await req.json()) as TCreateUserBody;
 
-  const res = (await fetch(`${nhostURL}/signup/email-password`, {
+  const res = (await fetch(`${nhostAuthURL}/signup/email-password`, {
     method: "POST",
     headers: {
       "content-type": "application/json",
@@ -33,7 +33,7 @@ export default async (req: Request, _context: Context) => {
         { id: "", error: { name: "nhost error", ...res.error } },
       ] satisfies TServerResponse<Error>),
       {
-        status: 500,
+        status: res.error.status,
       },
     );
   }

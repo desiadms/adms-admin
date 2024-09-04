@@ -2,6 +2,7 @@ import { useMutation } from "@apollo/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Box, Button, Divider, Typography } from "@mui/joy";
 import { useNavigate, useRouterState } from "@tanstack/react-router";
+import axios from "axios";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -68,15 +69,15 @@ export function CreateForm({
     try {
       const parsedActiveProject =
         activeProject === "unemployed" ? null : activeProject;
-      const createUser = fetch("/api/users/create", {
-        method: "POST",
-        body: JSON.stringify({
-          email,
-          password,
-          activeProject: parsedActiveProject,
-        } satisfies TCreateUserBody),
-      })
-        .then((res) => res.json() as Promise<TServerResponse>)
+      const createUser = axios
+        .post<TServerResponse>("/api/users/create", {
+          body: {
+            email,
+            password,
+            activeProject: parsedActiveProject,
+          } satisfies TCreateUserBody,
+        })
+        .then((res) => res.data)
         .then((res) => {
           const id = res?.[0]?.id;
 
