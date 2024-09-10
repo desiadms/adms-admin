@@ -44,7 +44,10 @@ const oneMB = 1024 * 1024;
 // doesn't support webp. yup.
 async function getBase64Image(imageUrl: string) {
   // Fetch the image as a Blob
-  const response = await fetch(imageUrl);
+  // Due to the following issue, chrome doesn't allow to fetch images from S3 when you fetch from img src tag and also via fetch.
+  // https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req/856948#856948
+  // Adding a random query param tricks chrome to fetch the image, as it won't look at the cache (from src tag, which doesn't contain an origin)
+  const response = await fetch(`${imageUrl}&trickChrome=${Date.now()}`);
   const blob = await response.blob();
 
   // Check the MIME type to see if it's an image
