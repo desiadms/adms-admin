@@ -71,12 +71,10 @@ export function CreateForm({
         activeProject === "unemployed" ? null : activeProject;
       const createUser = axios
         .post<TServerResponse>("/api/users/create", {
-          body: {
-            email,
-            password,
-            activeProject: parsedActiveProject,
-          } satisfies TCreateUserBody,
-        })
+          email,
+          password,
+          activeProject: parsedActiveProject,
+        } satisfies TCreateUserBody)
         .then((res) => res.data)
         .then((res) => {
           const id = res?.[0]?.id;

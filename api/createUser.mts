@@ -1,5 +1,6 @@
 import { Config, Context } from "@netlify/functions";
 import { SignUpResponse } from "@nhost/hasura-auth-js";
+import axios from "axios";
 import { TServerResponse } from "../src/globals";
 import { nhostAuthURL } from "./common";
 
@@ -13,24 +14,25 @@ export default async (req: Request, _context: Context) => {
   const { email, password, activeProject } =
     (await req.json()) as TCreateUserBody;
 
-  const res = (await fetch(`${nhostAuthURL}/signup/email-password`, {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
+  const res = await axios
+    .post<SignUpResponse>(`${nhostAuthURL}/signup/email-password`, {
       email,
       password,
       options: { metadata: { activeProject } },
-    }),
-  }).then((res) => res.json())) as SignUpResponse;
+    })
+    .then((res) => res.data)
 
-  console.log("nhost user signed up", res);
+    .catch((error) => {
+      console.error("nhost user signup error", error);
+    });
 
-  if (res.error) {
+  if (res?.error) {
     return new Response(
       JSON.stringify([
-        { id: "", error: { name: "nhost error", ...res.error } },
+        {
+          id: "",
+          error: { name: "nhost error", message: JSON.stringify(res.error) },
+        },
       ] satisfies TServerResponse<Error>),
       {
         status: res.error.status,
@@ -38,7 +40,7 @@ export default async (req: Request, _context: Context) => {
     );
   }
 
-  const userId = res.session?.user.id;
+  const userId = res && res.session?.user.id;
 
   if (!userId) throw new Error("No user id returned from nhost");
 
