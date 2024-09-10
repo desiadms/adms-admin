@@ -79,6 +79,7 @@ export const TasksDisposalFragment = graphql(/* GraphQL */ `
       created_at
       taken_at_step
     }
+    load_call
     debris_type_data {
       name
     }
@@ -90,6 +91,7 @@ export const TasksDisposalFragment = graphql(/* GraphQL */ `
     }
     truck_data {
       truck_number
+      cubic_yardage
     }
     userPin: tasks_disposal_user {
       email
@@ -442,6 +444,10 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
               contractorName: disposalTask?.contractor_data?.name,
               truckNumber: disposalTask?.truck_data?.truck_number,
               disposalSiteName: disposalTask?.disposal_site_data?.name,
+              loadCall: disposalTask.load_call,
+              netCubicYardage:
+                disposalTask?.truck_data?.cubic_yardage ||
+                0 * disposalTask.load_call,
             });
           }),
         };

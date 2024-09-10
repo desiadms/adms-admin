@@ -462,10 +462,12 @@ export function TaskReportTable() {
           },
         },
         {
-          headerName: "Debris Site",
+          headerName: "Debris Type",
           valueGetter: (params) => {
             if (!params.data) return "-";
-            return "debrisSite" in params.data ? params.data.debrisSite : "-";
+            return "debrisTypeName" in params.data
+              ? params.data.debrisTypeName
+              : "-";
           },
         },
         {
@@ -478,11 +480,27 @@ export function TaskReportTable() {
           },
         },
         {
+          headerName: "Load Call",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "loadCall" in params.data ? `${params.data.loadCall}%` : "-";
+          },
+        },
+        {
+          headerName: "Net Cubic Yardage",
+          valueGetter: (params) => {
+            if (!params.data) return "-";
+            return "netCubicYardage" in params.data
+              ? params.data.netCubicYardage
+              : "-";
+          },
+        },
+        {
           headerName: "Disposal Site",
           valueGetter: (params) => {
             if (!params.data) return "-";
-            return "disposalSite" in params.data
-              ? params.data.disposalSite
+            return "disposalSiteName" in params.data
+              ? params.data.disposalSiteName
               : "-";
           },
         },
