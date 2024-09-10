@@ -483,7 +483,9 @@ export function TaskReportTable() {
           headerName: "Load Call",
           valueGetter: (params) => {
             if (!params.data) return "-";
-            return "loadCall" in params.data ? `${params.data.loadCall}%` : "-";
+            return "load_call" in params.data
+              ? `${params.data.load_call}%`
+              : "-";
           },
         },
         {
