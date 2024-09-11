@@ -188,7 +188,7 @@ export function TasksForPDF({ data }: { data: TDateEntryPdf[] }) {
             "taskId",
           ]);
           return (
-            <View>
+            <View key={task.taskId}>
               <Text style={{ fontSize: 18, marginBottom: 10 }}>
                 Task ID: {task.taskId}
               </Text>
@@ -296,6 +296,8 @@ function DownloadPdfTasks({ api }: { api: GridApi<TDataEntry> }) {
     );
 
     setGatheredData(enhancedData);
+    setCompletedImages(0);
+    setTotalImages(0);
   }
 
   return (
