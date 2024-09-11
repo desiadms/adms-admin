@@ -44,7 +44,7 @@ const oneMB = 1024 * 1024;
 // doesn't support webp. yup.
 async function getBase64Image(imageUrl: string) {
   // Fetch the image as a Blob
-  // Due to the following issue, chrome doesn't allow to fetch images from S3 when you fetch from img src tag and also via fetch.
+  // Due to the following issue, chrome doesn't allow to fetch images from S3 when you fetch from img src tag and then via fetch.
   // https://serverfault.com/questions/856904/chrome-s3-cloudfront-no-access-control-allow-origin-header-on-initial-xhr-req/856948#856948
   // Adding a random query param tricks chrome to fetch the image, as it won't look at the cache (from src tag, which doesn't contain an origin)
   const response = await fetch(`${imageUrl}&trickChrome=${Date.now()}`);
@@ -74,27 +74,34 @@ async function getBase64Image(imageUrl: string) {
 
 const base64ImagesMap = new Map<string, string>();
 
-async function dataBase64Enahanced(data: TDataEntry[] | undefined) {
+async function dataBase64Enahanced(
+  data: TDataEntry[] | undefined,
+  setAsCompleted: () => void,
+) {
   const promises =
     data?.map(async (task) => {
       return {
         ...task,
         images: await Promise.all(
           task.images?.map(async (image) => {
-            const cachedBase64 = base64ImagesMap.get(image.id);
+            try {
+              const cachedBase64 = base64ImagesMap.get(image.id);
 
-            if (cachedBase64)
+              if (cachedBase64)
+                return {
+                  ...image,
+                  base64: cachedBase64,
+                };
+
+              const base64 = await getBase64Image(image.url || "");
+              base64ImagesMap.set(image.id, base64);
               return {
                 ...image,
-                base64: cachedBase64,
+                base64,
               };
-
-            const base64 = await getBase64Image(image.url || "");
-            base64ImagesMap.set(image.id, base64);
-            return {
-              ...image,
-              base64,
-            };
+            } finally {
+              setAsCompleted();
+            }
           }),
         ),
       };
@@ -265,15 +272,28 @@ type TDateEntryPdf = Omit<TDataEntry, "images"> & {
 
 function DownloadPdfTasks({ api }: { api: GridApi<TDataEntry> }) {
   const [open, setOpen] = useState<boolean>(false);
+  const [completedImages, setCompletedImages] = useState(0);
+  const [totalImages, setTotalImages] = useState(0);
+
+  const loadingProgress = `${completedImages}/${totalImages}`;
+
   const [gatheredData, setGatheredData] = useState<TDateEntryPdf[]>([]);
 
   async function gatherDataOnModalOpen() {
     const mutableData: TDataEntry[] = [];
+    let imageCount = 0;
     api.forEachNodeAfterFilterAndSort((node) => {
-      if (node?.data) mutableData.push(node.data);
+      if (node?.data) {
+        mutableData.push(node.data);
+        imageCount += node.data.images.length;
+      }
     });
 
-    const enhancedData = await dataBase64Enahanced(mutableData);
+    setTotalImages(imageCount);
+
+    const enhancedData = await dataBase64Enahanced(mutableData, () =>
+      setCompletedImages((prev) => prev + 1),
+    );
 
     setGatheredData(enhancedData);
   }
@@ -308,7 +328,10 @@ function DownloadPdfTasks({ api }: { api: GridApi<TDataEntry> }) {
               <DownloadConfirm data={gatheredData} />
             ) : (
               <Box>
-                <LoadingContent disabled={true} text="Preparing Data" />
+                <LoadingContent
+                  disabled={true}
+                  text={`Preparing data: ${loadingProgress}`}
+                />
               </Box>
             )}
           </DialogActions>
