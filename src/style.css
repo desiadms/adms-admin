@@ -48,3 +48,9 @@ body {
     border-top: 1px solid inherit;
   }
 }
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  box-shadow: none !important;
+  border: 1px solid var(--joy-palette-neutral-200);
+}

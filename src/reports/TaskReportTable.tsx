@@ -24,7 +24,6 @@ import toast, { LoaderIcon } from "react-hot-toast";
 import * as R from "remeda";
 import { DateRange } from "../components/DateRange";
 import { Table } from "../components/Table";
-import { tableTopToolbarHeight } from "../globals";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
 import {
@@ -32,6 +31,7 @@ import {
   formatToEST,
   normalizeKeyObjectToLabel,
 } from "../utils";
+import { MapButton } from "./MapButton";
 import { MapTasks } from "./MapTasks";
 import {
   TDataEntry,
@@ -554,19 +554,6 @@ export function TaskReportTable() {
 
   const [isMapView, setIsMapView] = useState<boolean>(false);
 
-  const MapViewButton = useMemo(
-    () => (
-      <Button
-        variant="outlined"
-        size="sm"
-        onClick={() => setIsMapView((prev) => !prev)}
-      >
-        {isMapView ? "Table View" : "Map View"}
-      </Button>
-    ),
-    [isMapView],
-  );
-
   const rightChildren = useCallback(
     (api: GridApi) => {
       return (
@@ -595,32 +582,21 @@ export function TaskReportTable() {
           >
             Export to CSV
           </Button>
-          {MapViewButton}
+          <MapButton isMapView={isMapView} setIsMapView={setIsMapView} />
         </Box>
       );
     },
-    [MapViewButton],
+    [isMapView],
   );
 
   return (
     <Box>
-      {isMapView ? (
-        <Box>
-          <Box
-            sx={{
-              height: tableTopToolbarHeight,
-              px: 1,
-              display: "flex",
-              gap: 1,
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <DateRange />
-            {MapViewButton}
-          </Box>
-          <MapTasks tasks={data} />
-        </Box>
+      {!isMapView ? (
+        <MapTasks
+          tasks={data}
+          isMapView={isMapView}
+          setIsMapView={setIsMapView}
+        />
       ) : (
         <Table
           rowData={data}
