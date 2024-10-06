@@ -8,12 +8,21 @@ import {
 import "ag-grid-community/styles/ag-grid.css"; // Mandatory CSS required by the grid
 import "ag-grid-community/styles/ag-theme-quartz.css"; // Optional Theme applied to the grid
 import { AgGridReact } from "ag-grid-react"; // AG Grid Component
-import { ComponentProps, ReactNode, useCallback, useState } from "react";
+import {
+  ComponentProps,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { IoCloseSharp, IoSearchOutline } from "react-icons/io5";
 import { useDarkMode } from "../admin";
-import { borderColor, pageContainerHeight, useTableApi } from "../globals";
-
-const tableTopToolbarHeight = 50;
+import {
+  borderColor,
+  pageContainerHeight,
+  tableTopToolbarHeight,
+  useTableApi,
+} from "../globals";
 
 type RequiredTableField = { id: string };
 
@@ -61,7 +70,7 @@ function TableTopToolbar<TData extends RequiredTableField>({
               display: "flex",
               alignItems: "center",
               flexWrap: "wrap",
-              gap: 2,
+              gap: 1,
             }}
           >
             <Input
@@ -117,11 +126,13 @@ export function Table<TData extends RequiredTableField>({
   getContextMenuItems,
   defaultColDef,
   disableSearch,
+  replaceTableContent,
   ...props
 }: ComponentProps<typeof AgGridReact<TData>> &
   Omit<TTableTopToolbar<TData>, "api"> & {
     handleNavigate?: (params?: TData) => void;
     disableSearch?: boolean;
+    replaceTableContent?: ReactNode;
   }) {
   const darkMode = useDarkMode();
   const {
@@ -130,13 +141,14 @@ export function Table<TData extends RequiredTableField>({
 
   const [api, setApi] = useTableApi();
 
+  // clean api api on component unmount
+  useEffect(() => {
+    () => setApi(null);
+  }, [setApi]);
+
   const getRowId = useCallback((params: GetRowIdParams<TData>) => {
     return params.data.id.toString();
   }, []);
-
-  const onGridPreDestroyed = useCallback(() => {
-    setApi(null);
-  }, [setApi]);
 
   const onGridReady = useCallback(
     (params) => {
@@ -167,36 +179,39 @@ export function Table<TData extends RequiredTableField>({
       ) : (
         <Box sx={{ height: tableTopToolbarHeight }} />
       )}
-      <Box
-        sx={{
-          height: `calc(100% - ${tableTopToolbarHeight}px)`,
-          borderTop: borderColor,
-        }}
-        className={
-          darkMode
-            ? "ag-theme-quartz-dark ag-theme-dark-custom"
-            : "ag-theme-quartz ag-theme-light-custom"
-        }
-      >
-        <AgGridReact
-          key={pathname}
-          defaultColDef={{
-            filter: "agTextColumnFilter",
-            floatingFilter: true,
-            menuTabs: ["filterMenuTab"],
-            ...defaultColDef,
+      {replaceTableContent ? (
+        replaceTableContent
+      ) : (
+        <Box
+          sx={{
+            height: `calc(100% - ${tableTopToolbarHeight}px)`,
+            borderTop: borderColor,
           }}
-          tooltipShowDelay={0}
-          tooltipHideDelay={0}
-          enableBrowserTooltips
-          onGridReady={onGridReady}
-          getRowId={getRowId}
-          onGridPreDestroyed={onGridPreDestroyed}
-          onCellDoubleClicked={onCellDoubleClicked}
-          getContextMenuItems={getContextMenuItems}
-          {...props}
-        />
-      </Box>
+          className={
+            darkMode
+              ? "ag-theme-quartz-dark ag-theme-dark-custom"
+              : "ag-theme-quartz ag-theme-light-custom"
+          }
+        >
+          <AgGridReact
+            key={pathname}
+            defaultColDef={{
+              filter: "agTextColumnFilter",
+              floatingFilter: true,
+              menuTabs: ["filterMenuTab"],
+              ...defaultColDef,
+            }}
+            tooltipShowDelay={0}
+            tooltipHideDelay={0}
+            enableBrowserTooltips
+            onGridReady={onGridReady}
+            getRowId={getRowId}
+            onCellDoubleClicked={onCellDoubleClicked}
+            getContextMenuItems={getContextMenuItems}
+            {...props}
+          />
+        </Box>
+      )}
     </Box>
   );
 }

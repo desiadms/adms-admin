@@ -4,6 +4,8 @@ import { GridApi } from "ag-grid-community";
 import { atom, useAtom } from "jotai";
 
 export const headerHeight = 65;
+export const tableTopToolbarHeight = 50;
+
 export const pageContainerHeight = `calc(100dvh - ${headerHeight}px)`;
 export const borderColor = (theme: Theme) =>
   theme.palette.mode === "dark"

@@ -273,10 +273,6 @@ function TabsWrapper({
           sx={{
             textTransform: "uppercase",
             cursor: "pointer",
-            "& a": {
-              textDecorationLine: "none !important",
-              color: "inherit",
-            },
             color: (theme) =>
               theme.palette.mode === "dark" ? "white" : "black",
             "&:hover": {
@@ -291,7 +287,13 @@ function TabsWrapper({
             textTransform="capitalize"
             to={to}
             params={params}
+            activeProps={{
+              style: {
+                textDecoration: "underline",
+              },
+            }}
             sx={{
+              color: "inherit",
               [theme.breakpoints.down("md")]: {
                 width: "100%",
                 padding: 2,
@@ -304,14 +306,7 @@ function TabsWrapper({
             }}
             search={true}
           >
-            <Typography
-              sx={{
-                '[data-status="active"] &': {
-                  fontWeight: 500,
-                  textDecorationLine: "underline",
-                },
-              }}
-            >
+            <Typography fontSize="sm" sx={{ textTransform: "uppercase" }}>
               {label}
             </Typography>
           </Link>

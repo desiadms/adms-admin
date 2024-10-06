@@ -24,6 +24,7 @@ import toast, { LoaderIcon } from "react-hot-toast";
 import * as R from "remeda";
 import { DateRange } from "../components/DateRange";
 import { Table } from "../components/Table";
+import { tableTopToolbarHeight } from "../globals";
 import { nhost } from "../nhost";
 import { useProject } from "../projects/hooks";
 import {
@@ -31,6 +32,7 @@ import {
   formatToEST,
   normalizeKeyObjectToLabel,
 } from "../utils";
+import { MapTasks } from "./MapTasks";
 import {
   TDataEntry,
   deleteTaskImage,
@@ -550,45 +552,83 @@ export function TaskReportTable() {
     [projectData],
   );
 
-  const rightChildren = useCallback((api: GridApi) => {
-    return (
-      <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
-        <DownloadPdfTasks api={api} />
-        <Button
-          variant="outlined"
-          size="sm"
-          onClick={() =>
-            api.exportDataAsCsv({
-              fileName: `tasks-${new Date().toISOString()}.csv`,
-              columnKeys:
-                api
-                  ?.getColumns()
-                  ?.filter((col) => {
-                    const headerName = col.getColDef().headerName;
-                    return (
-                      headerName !== "Images" &&
-                      headerName !== "Delete" &&
-                      headerName !== "ID"
-                    );
-                  })
-                  .map((col) => col.getColId()) || [],
-            })
-          }
-        >
-          Export to CSV
-        </Button>
-      </Box>
-    );
-  }, []);
+  const [isMapView, setIsMapView] = useState<boolean>(false);
+
+  const MapViewButton = useMemo(
+    () => (
+      <Button
+        variant="outlined"
+        size="sm"
+        onClick={() => setIsMapView((prev) => !prev)}
+      >
+        {isMapView ? "Table View" : "Map View"}
+      </Button>
+    ),
+    [isMapView],
+  );
+
+  const rightChildren = useCallback(
+    (api: GridApi) => {
+      return (
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
+          <DownloadPdfTasks api={api} />
+          <Button
+            variant="outlined"
+            size="sm"
+            onClick={() =>
+              api.exportDataAsCsv({
+                fileName: `tasks-${new Date().toISOString()}.csv`,
+                columnKeys:
+                  api
+                    ?.getColumns()
+                    ?.filter((col) => {
+                      const headerName = col.getColDef().headerName;
+                      return (
+                        headerName !== "Images" &&
+                        headerName !== "Delete" &&
+                        headerName !== "ID"
+                      );
+                    })
+                    .map((col) => col.getColId()) || [],
+              })
+            }
+          >
+            Export to CSV
+          </Button>
+          {MapViewButton}
+        </Box>
+      );
+    },
+    [MapViewButton],
+  );
 
   return (
     <Box>
-      <Table
-        rowData={data}
-        columnDefs={columnDefs}
-        rightChildren={rightChildren}
-        leftChildren={DateRange}
-      />
+      {isMapView ? (
+        <Box>
+          <Box
+            sx={{
+              height: tableTopToolbarHeight,
+              px: 1,
+              display: "flex",
+              gap: 1,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <DateRange />
+            {MapViewButton}
+          </Box>
+          <MapTasks tasks={data} />
+        </Box>
+      ) : (
+        <Table
+          rowData={data}
+          columnDefs={columnDefs}
+          rightChildren={rightChildren}
+          leftChildren={DateRange}
+        />
+      )}
     </Box>
   );
 }
