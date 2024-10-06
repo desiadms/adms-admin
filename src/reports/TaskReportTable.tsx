@@ -591,7 +591,7 @@ export function TaskReportTable() {
 
   return (
     <Box>
-      {!isMapView ? (
+      {isMapView ? (
         <MapTasks
           tasks={data}
           isMapView={isMapView}
