@@ -1,16 +1,17 @@
-import Link, { LinkProps } from "@mui/joy/Link";
+import Link, { type LinkProps } from "@mui/joy/Link";
 
 import { Link as RouterLink, createLink } from "@tanstack/react-router";
 
 function JoyLink({
-  children,
-  ...props
+	children,
+	...props
 }: LinkProps & { children: React.ReactNode }) {
-  return (
-    <Link component={RouterLink} {...props}>
-      {children}
-    </Link>
-  );
+	const { ref, ...rest } = props;
+	return (
+		<Link component={RouterLink} {...rest}>
+			{children}
+		</Link>
+	);
 }
 
 const JoyRouterLink = createLink(JoyLink);

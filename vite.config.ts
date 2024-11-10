@@ -11,13 +11,9 @@ export default defineConfig({
   plugins: [
     react(),
     ViteRestart({
-      restart: [".eslintrc*", ".prettierrc*", "tsconfig.json"],
+      restart: ["tsconfig.json"],
     }),
     checker({
-      eslint: {
-        // for example, lint .ts and .tsx
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
-      },
       typescript: true,
     }),
   ],

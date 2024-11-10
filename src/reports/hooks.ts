@@ -3,7 +3,7 @@ import { useParams } from "@tanstack/react-router";
 import dayjs from "dayjs";
 import { atom, useAtom } from "jotai";
 import { useCallback, useMemo } from "react";
-import { AllTasksByProjectQuery, Images } from "../__generated__/gql/graphql";
+import type { AllTasksByProjectQuery, Images } from "../__generated__/gql/graphql";
 import { graphql, readFragment } from "../graphql";
 import { nhost } from "../nhost";
 import { genUpperLowerDate, objectEntries, useQuerySub } from "../utils";
@@ -454,6 +454,10 @@ function normalizeTasks(data: AllTasksByProjectQuery | undefined) {
     })
     .filter(Boolean);
 }
+
+
+
+
 
 export function useAllTasksByProjectAndUser(projectId: string, userId: string) {
   const {
