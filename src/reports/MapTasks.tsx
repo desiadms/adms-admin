@@ -18,7 +18,9 @@ type TaskWithCoordinates = {
 	longitude: number;
 } & TTasks[number];
 
-const Icon = new L.Icon.Default();
+const Icon = new L.Icon.Default({
+	iconUrl: "/images/marker.png",
+});
 Icon.options.shadowSize = [0, 0];
 
 function MapMarker({ task }: { task: TaskWithCoordinates }) {
